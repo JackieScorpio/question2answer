@@ -346,11 +346,15 @@ class qa_html_theme extends qa_html_theme_base
 			? ''
 			: '<img src="' . $this->rooturl . $this->icon_url . '/closed-q-list.png" class="qam-q-list-close-icon" alt="' . $closedText . '" title="' . $closedText . '"/>';
 
+		// get postid of a question from url
+		$splitStringArray = explode('qa=', $q_item['url']);
+		$postid = substr($splitStringArray[1], 0 , 1);
+
 		$this->output(
 			'<div class="qa-q-item-title">',
 			// add closed note in title
 			$imgHtml,
-			'<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(1)">' . $q_item['title'] . '</a>',
+			'<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(' . $postid . ')">' . $q_item['title'] . '</a>',
 			'</div>'
 		);
 	}
