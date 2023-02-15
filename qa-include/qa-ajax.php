@@ -73,6 +73,7 @@ $routing = array(
 	'wallpost' => 'wallpost.php',
 	'click_wall' => 'click-wall.php',
 	'click_pm' => 'click-pm.php',
+	'click_question_times' => 'click_question_times.php',
 );
 
 $operation = qa_post_text('qa_operation');

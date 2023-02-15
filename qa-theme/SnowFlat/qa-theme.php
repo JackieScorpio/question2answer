@@ -339,6 +339,8 @@ class qa_html_theme extends qa_html_theme_base
 	 */
 	public function q_item_title($q_item)
 	{
+		global $qa_question_click_times;
+
 		$closedText = qa_lang('main/closed');
 		$imgHtml = empty($q_item['closed'])
 			? ''
@@ -348,7 +350,7 @@ class qa_html_theme extends qa_html_theme_base
 			'<div class="qa-q-item-title">',
 			// add closed note in title
 			$imgHtml,
-			'<a href="' . $q_item['url'] . '">' . $q_item['title'] . '</a>',
+			'<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(1)">' . $q_item['title'] . '</a>',
 			'</div>'
 		);
 	}

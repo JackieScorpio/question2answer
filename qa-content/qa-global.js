@@ -841,3 +841,28 @@ function qa_pm_click(messageid, target, box)
 
 	return false;
 }
+
+/**
+ * times for clicking question title
+ */
+function qa_question_click_times(postid) {
+
+	var params = {};
+
+	params.postid = postid;
+
+	qa_ajax_post('click_question_times', params,
+		function(lines) {
+			console.log('callback', lines);
+		}
+	);
+
+	// qa_db_query_sub
+	// 此处不能用ajax，要直接用post请求修改数据库
+	// $.post $_post 用什么方法？
+	
+}
+
+function test() {
+	console.log('test here');
+}
