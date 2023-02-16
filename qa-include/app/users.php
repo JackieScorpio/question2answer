@@ -1351,7 +1351,6 @@ function qa_check_form_security_code($action, $value)
 
 		if (count($parts) == 3) {
 			$loggedin = $parts[0];
-			echo 'user111' . $loggedin;
 			$timestamp = $parts[1];
 			$hash = $parts[2];
 			$timenow = qa_opt('db_time');

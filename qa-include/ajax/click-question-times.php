@@ -20,6 +20,11 @@
 */
 
 // add 1 on field clicktimes when clicking a question title
+require_once QA_INCLUDE_DIR . 'app/users.php';
+
+$userid = qa_get_logged_in_userid();
+
+
 $postid = qa_post_text('postid');
 
 $result = qa_db_read_one_assoc(qa_db_query_sub(
