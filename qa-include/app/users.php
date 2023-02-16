@@ -297,6 +297,10 @@ if (QA_FINAL_EXTERNAL_USERS) {
 			} else
 				$sessioncode = $userinfo['sessioncode'];
 
+			// record number of days the user logged in
+			// caution: this function needs to run before function 'qa_db_user_logged_in' since we need last login time to calculate login days.
+			qa_db_user_logged_in_days($userid);
+			
 			qa_db_user_logged_in($userid, qa_remote_ip_address());
 			qa_set_session_cookie($handle, $sessioncode, $remember);
 
@@ -1347,6 +1351,7 @@ function qa_check_form_security_code($action, $value)
 
 		if (count($parts) == 3) {
 			$loggedin = $parts[0];
+			echo 'user111' . $loggedin;
 			$timestamp = $parts[1];
 			$hash = $parts[2];
 			$timenow = qa_opt('db_time');

@@ -280,6 +280,59 @@ function qa_db_user_profile_set($userid, $field, $value)
 	);
 }
 
+/**
+ * add one day for field logindays
+ * @param mixed $userid
+ */
+function qa_db_user_add_one_day($userid) {
+
+	$logindays = qa_db_read_one_assoc(qa_db_query_sub(
+		'SELECT logindays FROM ^users WHERE userid=#',
+		$userid
+	));
+	$newLogindays = (int)(implode($logindays)) + 1;
+
+	qa_db_query_sub(
+		'UPDATE ^users SET logindays=$ WHERE userid=#',
+		$newLogindays, $userid
+	);
+}
+
+/**
+ * record number of days the user logged in
+ * @param mixed $userid
+ */
+function qa_db_user_logged_in_days($userid) {
+	// $result is an Array, we need to implode it to a string
+	$lastLoginTime = qa_db_read_one_assoc(qa_db_query_sub(
+		'SELECT loggedin FROM ^users WHERE userid=#',
+		$userid
+	));
+
+	$lastLoginDate = explode(' ', implode($lastLoginTime))[0];
+	$currentDate = date('Y-m-d');
+
+	// example array: [2020, 02, 02]
+	$lastLoginDateArray = explode('-', $lastLoginDate);
+	$currentDateArray = explode('-', $currentDate);
+
+	if ((int)$lastLoginDateArray[0] < (int)$currentDateArray[0]) {
+		// it's a new year now, so add one day directly
+		qa_db_user_add_one_day($userid);
+	} else if ((int)$lastLoginDateArray[0] == (int)$currentDateArray[0]) {
+		// it's a new month in one year now, so add one day directly
+		if ((int)$lastLoginDateArray[1] < (int)$currentDateArray[1]) {
+			qa_db_user_add_one_day($userid);
+		} else if ((int)$lastLoginDateArray[1] == (int)$currentDateArray[1]) {
+			if ((int)$lastLoginDateArray[2] < (int)$currentDateArray[2]) {
+				// it's a new day, so add one day
+				qa_db_user_add_one_day($userid);
+			}
+		}
+	} else {
+		// something wrong: current date is smaller
+	}
+}
 
 /**
  * Note in the database that $userid just logged in from $ip address
