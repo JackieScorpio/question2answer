@@ -55,7 +55,7 @@ function qa_record_user_online_time()
 		}
 
 		$newLastactiontime;
-		$newTotalactiontime;
+		$newTotalactiontime = $totalactiontime;
 
 		if(isset($lastactiontime)) {
 			$idleDuration = 300; // after more than 5 minutes, the user is deemed to have left
