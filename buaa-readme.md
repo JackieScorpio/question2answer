@@ -45,3 +45,7 @@
 - 表 qa_users 增加字段 lastactiontime， currentactiontime， totalactiontime（用户活跃总时长）
     - ALTER TABLE q2a.qa_users ADD lastactiontime varchar(255) NULL;
     - ALTER TABLE q2a.qa_users ADD totalactiontime varchar(255) NULL;
+
+## qa-config.php
+    unanswer.php page 无法打开 bug 修复
+        - 此处设置为true: define('QA_ALLOW_UNINDEXED_QUERIES', true);
