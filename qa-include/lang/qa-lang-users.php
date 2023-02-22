@@ -106,6 +106,8 @@ return array(
 	'private_messages' => 'Private messages:',
 	'private_messages_explanation' => 'Allow users to email you (without seeing your address)',
 	'profile_saved' => 'Profile saved',
+	'realname_label' => 'Realname:',
+	'realname_empty' => 'Realname must not be empty',
 	'register_button' => 'Register',
 	'register_limit' => 'Too many registrations - please try again in an hour',
 	'register_suspended' => 'Registration of new users has been temporarily suspended. Please try again soon.',

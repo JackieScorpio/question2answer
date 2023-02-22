@@ -46,6 +46,9 @@
     - ALTER TABLE q2a.qa_users ADD lastactiontime varchar(255) NULL;
     - ALTER TABLE q2a.qa_users ADD totalactiontime varchar(255) NULL;
 
+- 表 qa_users 增加字段 realname，记录用户的真实姓名
+    - ALTER TABLE q2a.qa_users ADD realname varchar(255) NULL;
+
 ## qa-config.php
     unanswer.php page 无法打开 bug 修复
         - 此处设置为true: define('QA_ALLOW_UNINDEXED_QUERIES', true);

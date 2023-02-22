@@ -85,6 +85,7 @@ if (qa_clicked('doregister')) {
 		$inemail = qa_post_text('email');
 		$inpassword = qa_post_text('password');
 		$inhandle = qa_post_text('handle');
+		$inrealname = qa_post_text('realname');
 		$interms = (int)qa_post_text('terms');
 
 		$inprofile = array();
@@ -97,7 +98,8 @@ if (qa_clicked('doregister')) {
 			// core validation
 			$errors = array_merge(
 				qa_handle_email_filter($inhandle, $inemail),
-				qa_password_validate($inpassword)
+				qa_password_validate($inpassword),
+				qa_realname_validate($inrealname),
 			);
 
 			// T&Cs validation
@@ -118,7 +120,7 @@ if (qa_clicked('doregister')) {
 				// register and redirect
 				qa_limits_increment(null, QA_LIMIT_REGISTRATIONS);
 
-				$userid = qa_create_new_user($inemail, $inpassword, $inhandle);
+				$userid = qa_create_new_user($inemail, $inpassword, $inhandle, QA_USER_LEVEL_BASIC, false, $inrealname);
 
 				foreach ($userfields as $userfield)
 					qa_db_user_profile_set($userid, $userfield['title'], $inprofile[$userfield['fieldid']]);
@@ -175,6 +177,12 @@ $qa_content['form'] = array(
 			'value' => qa_html(@$inemail),
 			'note' => qa_opt('email_privacy'),
 			'error' => qa_html(@$errors['email']),
+		),
+		'realname' => array(
+			'label' => qa_lang_html('users/realname_label'),
+			'tags' => 'name="realname" id="realname" dir="auto"',
+			'value' => qa_html(@$inrealname),
+			'error' => qa_html(@$errors['realname']),
 		),
 	),
 

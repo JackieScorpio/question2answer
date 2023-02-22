@@ -48,7 +48,7 @@ function qa_db_calc_passcheck($password, $salt)
  * @param string $ip
  * @return string
  */
-function qa_db_user_create($email, $password, $handle, $level, $ip)
+function qa_db_user_create($email, $password, $handle, $level, $ip, $realname)
 {
 	require_once QA_INCLUDE_DIR . 'util/string.php';
 
@@ -56,17 +56,17 @@ function qa_db_user_create($email, $password, $handle, $level, $ip)
 
 	if (QA_PASSWORD_HASH) {
 		qa_db_query_sub(
-			'INSERT INTO ^users (created, createip, email, passhash, level, handle, loggedin, loginip) ' .
-			'VALUES (NOW(), UNHEX($), $, $, #, $, NOW(), UNHEX($))',
-			$ipHex, $email, isset($password) ? password_hash($password, PASSWORD_BCRYPT) : null, (int)$level, $handle, $ipHex
+			'INSERT INTO ^users (created, createip, email, passhash, level, handle, loggedin, loginip, realname) ' .
+			'VALUES (NOW(), UNHEX($), $, $, #, $, NOW(), UNHEX($), $)',
+			$ipHex, $email, isset($password) ? password_hash($password, PASSWORD_BCRYPT) : null, (int)$level, $handle, $ipHex, $realname
 		);
 	} else {
 		$salt = isset($password) ? qa_random_alphanum(16) : null;
 
 		qa_db_query_sub(
-			'INSERT INTO ^users (created, createip, email, passsalt, passcheck, level, handle, loggedin, loginip) ' .
+			'INSERT INTO ^users (created, createip, email, passsalt, passcheck, level, handle, loggedin, loginip, realname) ' .
 			'VALUES (NOW(), UNHEX($), $, $, UNHEX($), #, $, NOW(), UNHEX($))',
-			$ipHex, $email, $salt, isset($password) ? qa_db_calc_passcheck($password, $salt) : null, (int)$level, $handle, $ipHex
+			$ipHex, $email, $salt, isset($password) ? qa_db_calc_passcheck($password, $salt) : null, (int)$level, $handle, $ipHex, $realname
 		);
 	}
 

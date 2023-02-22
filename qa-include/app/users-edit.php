@@ -169,6 +169,25 @@ function qa_password_validate($password, $olduser = null)
 	return array();
 }
 
+/**
+ * Return an array with a single element (key 'realname') if user-entered $realname is valid, otherwise an empty array.
+ * Works by calling through to all filter modules.
+ * @param string $realname
+ * @return array
+ */
+function qa_realname_validate($realname)
+{
+	$error = null;
+	if(!$realname) {
+		$error = qa_lang('users/realname_empty');
+	}
+
+	if (isset($error))
+		return array('realname' => $error);
+
+	return array();
+}
+
 
 /**
  * Create a new user (application level) with $email, $password, $handle and $level.
@@ -181,7 +200,7 @@ function qa_password_validate($password, $olduser = null)
  * @param bool $confirmed
  * @return mixed
  */
-function qa_create_new_user($email, $password, $handle, $level = QA_USER_LEVEL_BASIC, $confirmed = false)
+function qa_create_new_user($email, $password, $handle, $level = QA_USER_LEVEL_BASIC, $confirmed = false, $realname = '')
 {
 	if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
 
@@ -191,7 +210,7 @@ function qa_create_new_user($email, $password, $handle, $level = QA_USER_LEVEL_B
 	require_once QA_INCLUDE_DIR . 'app/emails.php';
 	require_once QA_INCLUDE_DIR . 'app/cookies.php';
 
-	$userid = qa_db_user_create($email, $password, $handle, $level, qa_remote_ip_address());
+	$userid = qa_db_user_create($email, $password, $handle, $level, qa_remote_ip_address(), $realname);
 	qa_db_points_update_ifuser($userid, null);
 	qa_db_uapprovecount_update();
 
