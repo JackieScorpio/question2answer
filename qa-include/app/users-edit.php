@@ -93,6 +93,26 @@ function qa_handle_email_filter(&$handle, &$email, $olduser = null)
 	return $errors;
 }
 
+function qa_realname_filter(&$realname, $olduser = null)
+{
+	require_once QA_INCLUDE_DIR . 'db/users.php';
+	require_once QA_INCLUDE_DIR . 'util/string.php';
+
+	$errors = array();
+
+	$error = null;
+	$filtermodules = qa_load_modules_with('filter', 'filter_realname');
+	
+	foreach ($filtermodules as $filtermodule) {
+		$error = $filtermodule->filter_realname($realname, $olduser);
+		if (isset($error)) {
+			$errors['realname'] = $error;
+			break;
+		}
+	}
+
+	return $errors;
+}
 
 /**
  * Make $handle valid and unique in the database - if $allowuserid is set, allow it to match that user only

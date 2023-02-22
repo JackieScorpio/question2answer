@@ -59,6 +59,13 @@ class qa_filter_basic
 		}
 	}
 
+	public function filter_realname(&$realname, $olduser)
+	{
+		if (!strlen($olduser['realname']) && !strlen($realname)) {
+			return qa_lang('users/realname_empty');
+		}
+	}
+
 	public function filter_question(&$question, &$errors, $oldquestion)
 	{
 		if ($oldquestion === null) {

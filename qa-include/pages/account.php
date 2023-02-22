@@ -80,6 +80,7 @@ else {
 		$inwallposts = qa_post_text('wall');
 		$inmailings = qa_post_text('mailings');
 		$inavatar = qa_post_text('avatar');
+		$inrealname = qa_post_text('realname');
 
 		$inprofile = array();
 		foreach ($userfields as $userfield)
@@ -88,11 +89,17 @@ else {
 		if (!qa_check_form_security_code('account', qa_post_text('code')))
 			$errors['page'] = qa_lang_html('misc/form_security_again');
 		else {
-			$errors = qa_handle_email_filter($inhandle, $inemail, $useraccount);
+			$handleAndEmailerrors = qa_handle_email_filter($inhandle, $inemail, $useraccount);
 
+			$realnameErrors = qa_realname_filter($inrealname, $useraccount);
+			
+			$errors = array_merge($handleAndEmailerrors, $realnameErrors);
+			
+			// change username
 			if (!isset($errors['handle']))
 				qa_db_user_set($userid, 'handle', $inhandle);
 
+			// change email
 			if (!isset($errors['email']) && $inemail !== $useraccount['email']) {
 				qa_db_user_set($userid, 'email', $inemail);
 				qa_db_user_set_flag($userid, QA_USER_FLAGS_EMAIL_CONFIRMED, false);
@@ -101,6 +108,10 @@ else {
 				if ($doconfirms)
 					qa_send_new_confirm($userid);
 			}
+
+			// add realname
+			if (!isset($errors['realname']))
+				qa_db_user_set($userid, 'realname', $inrealname);
 
 			if (qa_opt('allow_private_messages'))
 				qa_db_user_set_flag($userid, QA_USER_FLAGS_NO_MESSAGES, !$inmessages);
@@ -280,6 +291,15 @@ $qa_content['form_profile'] = array(
 			'error' => isset($errors['email']) ? qa_html($errors['email']) :
 				($pending_confirmation ? qa_insert_login_links(qa_lang_html('users/email_please_confirm')) : null),
 			'type' => $pending_confirmation ? 'email' : ($isblocked ? 'static' : 'email'),
+		),
+		
+		// user can't change realname in the future
+		'realname' => array(
+			'label' => qa_lang_html('users/realname_label'),
+			'tags' => 'name="realname"',
+			'value' => $useraccount['realname'] !== null ? $useraccount['realname'] : $inrealname,
+			'type' => $useraccount['realname'] !== null ? 'static' : 'text',
+			'error' => qa_html(@$errors['realname']),
 		),
 
 		'messages' => array(

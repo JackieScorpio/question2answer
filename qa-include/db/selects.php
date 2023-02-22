@@ -1371,7 +1371,7 @@ function qa_db_user_account_selectspec($useridhandle, $isuserid)
 {
 	return array(
 		'columns' => array(
-			'^users.userid', 'passsalt', 'passcheck' => 'HEX(passcheck)', 'passhash', 'email', 'level', 'emailcode', 'handle',
+			'^users.userid', 'passsalt', 'passcheck' => 'HEX(passcheck)', 'passhash', 'email', 'level', 'emailcode', 'handle', 'realname',
 			'created' => 'UNIX_TIMESTAMP(created)', 'sessioncode', 'sessionsource', 'flags', 'loggedin' => 'UNIX_TIMESTAMP(loggedin)',
 			'loginip', 'written' => 'UNIX_TIMESTAMP(written)', 'writeip',
 			'avatarblobid' => 'BINARY avatarblobid', // cast to BINARY due to MySQL bug which renders it signed in a union
