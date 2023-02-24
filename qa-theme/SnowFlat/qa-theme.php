@@ -347,8 +347,9 @@ class qa_html_theme extends qa_html_theme_base
 			: '<img src="' . $this->rooturl . $this->icon_url . '/closed-q-list.png" class="qam-q-list-close-icon" alt="' . $closedText . '" title="' . $closedText . '"/>';
 
 		// get postid of a question from url
-		$splitStringArray = explode('qa=', $q_item['url']);
-		$postid = substr($splitStringArray[1], 0 , 1);
+		$splitArrayByqa = explode('qa=', $q_item['url']);
+		$splitArrayByAndChar = explode('&', $splitArrayByqa[1]);
+		$postid = $splitArrayByAndChar[0];
 
 		$this->output(
 			'<div class="qa-q-item-title">',
