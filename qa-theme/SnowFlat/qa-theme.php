@@ -342,6 +342,8 @@ class qa_html_theme extends qa_html_theme_base
 		global $qa_question_click_times;
 
 		$closedText = qa_lang('main/closed');
+        $challengeText = "问答挑战";
+
 		$imgHtml = empty($q_item['closed'])
 			? ''
 			: '<img src="' . $this->rooturl . $this->icon_url . '/closed-q-list.png" class="qam-q-list-close-icon" alt="' . $closedText . '" title="' . $closedText . '"/>';
@@ -351,13 +353,24 @@ class qa_html_theme extends qa_html_theme_base
 		$splitArrayByAndChar = explode('&', $splitArrayByqa[1]);
 		$postid = $splitArrayByAndChar[0];
 
-		$this->output(
-			'<div class="qa-q-item-title">',
-			// add closed note in title
-			$imgHtml,
-			'<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(' . $postid . ')">' . $q_item['title'] . '</a>',
-			'</div>'
-		);
+        if (strcmp(substr($q_item['where']['data'], -16, 12), "问答挑战") == 0) {
+            $this->output(
+                '<div class="qa-q-item-title-challenge">',
+                // add closed note in title
+                $imgHtml,
+                '<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(' . $postid . ')">' . $q_item['title'] . '</a>',
+                '<img src="' . $this->rooturl . '../general' . '/q-challenge.png" class="qam-q-list-close-icon" alt="' . $challengeText . '" title="' . $challengeText . '"/>',
+                '</div>'
+            );
+        } else {
+            $this->output(
+                '<div class="qa-q-item-title">',
+                // add closed note in title
+                $imgHtml,
+                '<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(' . $postid . ')">' . $q_item['title'] . '</a>',
+                '</div>'
+            );
+        }
 	}
 
 	/**

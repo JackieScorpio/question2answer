@@ -681,12 +681,21 @@ class qa_html_theme_base
 				'</a>'
 			);
 		} else {
-			$this->output(
-				'<span class="qa-' . $class . '-nolink' . (@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
-				(@$navlink['favorited'] ? (' qa-' . $class . '-favorited') : '') . '"' .
-				(strlen(@$navlink['popup']) ? (' title="' . $navlink['popup'] . '"') : '') .
-				'>' . $navlink['label'] . '</span>'
-			);
+            if (strcmp($navlink['label'], "问答挑战") == 0) {
+                $this->output(
+                    '<span class="qa-' . $class . '-nolink-challenge' . (@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
+                    (@$navlink['favorited'] ? (' qa-' . $class . '-favorited') : '') . '"' .
+                    (strlen(@$navlink['popup']) ? (' title="' . $navlink['popup'] . '"') : '') .
+                    '>' . $navlink['label'] . '</span>'
+                );
+            } else {
+                $this->output(
+                    '<span class="qa-' . $class . '-nolink' . (@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
+                    (@$navlink['favorited'] ? (' qa-' . $class . '-favorited') : '') . '"' .
+                    (strlen(@$navlink['popup']) ? (' title="' . $navlink['popup'] . '"') : '') .
+                    '>' . $navlink['label'] . '</span>'
+                );
+            }
 		}
 
 		if (strlen(@$navlink['note']))

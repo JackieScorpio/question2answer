@@ -1205,7 +1205,25 @@ blockquote p {
 	color: #3498db;
 }
 .qa-q-item-title:hover .qam-q-list-close-icon {
-	background-color: #c0392b;
+	background-color: #3498db;
+	cursor: help;
+}
+
+.qa-q-item-title-challenge {
+	font-weight: bold;
+	font-size: 1.125em;
+	line-height: 1.35em;
+	display: block;
+	word-wrap: break-word;
+}
+.qa-q-item-title-challenge a {
+	color: #dc6708;
+}
+.qa-q-item-title-challenge a:hover, .qa-q-item-title a:active, .qa-q-item-title a:focus, .qa-q-item-title a:visited {
+	color: #3498db;
+}
+.qa-q-item-title-challenge:hover .qam-q-list-close-icon {
+	background-color: #3498db;
 	cursor: help;
 }
 
@@ -1592,7 +1610,7 @@ blockquote p {
 	border-bottom: 0 !important;
 }
 
-.qa-browse-cat-nolink, .qa-browse-cat-link,
+.qa-browse-cat-nolink-challenge, .qa-browse-cat-nolink, .qa-browse-cat-link,
 .qa-browse-cat-link:hover, .qa-browse-cat-link:visited {
 	background-color: #e74c3c;
 	display: inline-block;
@@ -1603,6 +1621,11 @@ blockquote p {
 
 .qa-browse-cat-nolink {
 	cursor: help;
+}
+
+.qa-browse-cat-nolink-challenge {
+	cursor: help;
+	background-color: #921a9b;
 }
 
 .qa-browse-cat-link {
