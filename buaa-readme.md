@@ -52,3 +52,6 @@
 ## qa-config.php
     unanswer.php page 无法打开 bug 修复
         - 此处设置为true: define('QA_ALLOW_UNINDEXED_QUERIES', true);
+
+## tips
+1. php version 7.4 is recommended, this can avoid bugs like categories can't be created(php version 8.0).
