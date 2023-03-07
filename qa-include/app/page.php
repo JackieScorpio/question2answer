@@ -184,7 +184,6 @@ function qa_get_request_content()
 	// new router
 	$router = qa_service('router');
 	qa_controller_routing($router);
-
 	try {
 		// use new Controller system
 		$route = $router->match($requestlower);
@@ -205,7 +204,7 @@ function qa_get_request_content()
 			$qa_content = require QA_INCLUDE_DIR . $routing[$requestlower];
 
 		} elseif (isset($routing[$firstlower . '/'])) {
-			qa_set_template($firstlower);
+            qa_set_template($firstlower);
 			$qa_content = require QA_INCLUDE_DIR . $routing[$firstlower . '/'];
 
 		} elseif (is_numeric($requestparts[0])) {
@@ -772,6 +771,22 @@ function qa_content_prepare($voting = false, $categoryids = array())
 		'qa_root' => qa_path_to_root(),
 		'qa_request' => $request,
 	);
+
+    $taskInfo = qa_db_read_all_assoc(qa_db_query_sub(
+        'SELECT 
+                *
+           FROM 
+               ^task
+           where now() >= started and now() <= ended 
+          '
+    ));
+
+    if (!empty($taskInfo)) {
+        $qa_content['side_task'] = array();
+        foreach ($taskInfo as $key => $value) {
+            $qa_content['side_task'][] = str_replace('?', $value['count'], $value['description']);
+        }
+    }
 
 	return $qa_content;
 }

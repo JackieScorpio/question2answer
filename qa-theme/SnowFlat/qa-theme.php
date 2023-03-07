@@ -315,6 +315,7 @@ class qa_html_theme extends qa_html_theme_base
 			$this->output_raw($this->content['sidepanel']);
 		$this->feed();
 		$this->widgets('side', 'bottom');
+        $this->taskList();
 		$this->output('</div> <!-- qa-sidepanel -->', '');
 	}
 

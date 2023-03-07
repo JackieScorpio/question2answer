@@ -38,649 +38,649 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 
 class qa_html_theme_base
 {
-	/** @var string */
-	public $template;
-
-	/** @var array */
-	public $content;
-
-	/** @var string */
-	public $rooturl;
-
-	/** @var string */
-	public $request;
-
-	/**
-	 * Whether text direction is Right-To-Left
-	 *
-	 * @var bool
-	 */
-	public $isRTL;
-
-	/**
-	 * Whether to indent the HTML
-	 *
-	 * @var bool
-	 */
-	protected $minifyHtml;
-
-	/** @var int */
-	protected $indent = 0;
-
-	/** @var int */
-	protected $lines = 0;
-
-	/** @var array */
-	protected $context = array();
-
-	/**
-	 * Whether to use new block layout in rankings (true) or fall back to tables (false)
-	 * @var bool
-	 */
-	protected $ranking_block_layout = false;
-
-	/**
-	 * Theme 'slug' to use as CSS class
-	 * @var string
-	 */
-	protected $theme;
-
-
-	/**
-	 * Initialize the object and assign local variables.
-	 * @param string $template
-	 * @param string $content
-	 * @param string $rooturl
-	 * @param string $request
-	 */
-	public function __construct($template, $content, $rooturl, $request)
-	{
-		$this->template = $template;
-		$this->content = $content;
-		$this->rooturl = $rooturl;
-		$this->request = $request;
-		$this->isRTL = isset($content['direction']) && $content['direction'] === 'rtl';
-		$this->minifyHtml = !empty($content['options']['minify_html']);
-	}
-
-	/**
-	 * @deprecated PHP4-style constructor deprecated from 1.7; please use proper `__construct`
-	 * function instead.
-	 * @param string $template
-	 * @param string $content
-	 * @param string $rooturl
-	 * @param string $request
-	 */
-	public function qa_html_theme_base($template, $content, $rooturl, $request)
-	{
-		self::__construct($template, $content, $rooturl, $request);
-	}
-
-
-	/**
-	 * Output each element in $elements on a separate line, with automatic HTML indenting.
-	 * This should be passed markup which uses the <tag/> form for unpaired tags, to help keep
-	 * track of indenting, although its actual output converts these to <tag> for W3C validation.
-	 * @param array $elements
-	 */
-	public function output_array($elements)
-	{
-		foreach ($elements as $element) {
-			$line = str_replace('/>', '>', $element);
-
-			if ($this->minifyHtml) {
-				if (strlen($line))
-					echo $line . "\n";
-			} else {
-				$delta = substr_count($element, '<') - substr_count($element, '<!') - 2 * substr_count($element, '</') - substr_count($element, '/>');
-
-				if ($delta < 0) {
-					$this->indent += $delta;
-				}
-
-				echo str_repeat("\t", max(0, $this->indent)) . $line . "\n";
-
-				if ($delta > 0) {
-					$this->indent += $delta;
-				}
-			}
-
-			$this->lines++;
-		}
-	}
-
-
-	/**
-	 * Output each passed parameter on a separate line - see output_array() comments.
-	 */
-	public function output() // other parameters picked up via func_get_args()
-	{
-		$args = func_get_args();
-		$this->output_array($args);
-	}
-
-
-	/**
-	 * Output $html at the current indent level, but don't change indent level based on the markup within.
-	 * Useful for user-entered HTML which is unlikely to follow the rules we need to track indenting.
-	 * @param string $html
-	 */
-	public function output_raw($html)
-	{
-		if (strlen($html))
-			echo str_repeat("\t", max(0, $this->indent)) . $html . "\n";
-	}
-
-
-	/**
-	 * Output the three elements ['prefix'], ['data'] and ['suffix'] of $parts (if they're defined),
-	 * with appropriate CSS classes based on $class, using $outertag and $innertag in the markup.
-	 * @param array $parts
-	 * @param string $class
-	 * @param string $outertag
-	 * @param string $innertag
-	 * @param string $extraclass
-	 */
-	public function output_split($parts, $class, $outertag = 'span', $innertag = 'span', $extraclass = null)
-	{
-		if (empty($parts) && strtolower($outertag) != 'td')
-			return;
-
-		$this->output(
-			'<' . $outertag . ' class="' . $class . (isset($extraclass) ? (' ' . $extraclass) : '') . '">',
-			(strlen(@$parts['prefix']) ? ('<' . $innertag . ' class="' . $class . '-pad">' . $parts['prefix'] . '</' . $innertag . '>') : '') .
-			(strlen(@$parts['data']) ? ('<' . $innertag . ' class="' . $class . '-data">' . $parts['data'] . '</' . $innertag . '>') : '') .
-			(strlen(@$parts['suffix']) ? ('<' . $innertag . ' class="' . $class . '-pad">' . $parts['suffix'] . '</' . $innertag . '>') : ''),
-			'</' . $outertag . '>'
-		);
-	}
-
-
-	/**
-	 * Set some context, which be accessed via $this->context for a function to know where it's being used on the page.
-	 * @param string $key
-	 * @param string $value
-	 */
-	public function set_context($key, $value)
-	{
-		$this->context[$key] = $value;
-	}
-
-
-	/**
-	 * Clear some context (used at the end of the appropriate loop).
-	 * @param string $key
-	 */
-	public function clear_context($key)
-	{
-		unset($this->context[$key]);
-	}
-
-
-	/**
-	 * Reorder the parts of the page according to the $parts array which contains part keys in their new order. Call this
-	 * before main_parts(). See the docs for qa_array_reorder() in util/sort.php for the other parameters.
-	 * @param array $parts
-	 * @param string|null $beforekey
-	 * @param bool $reorderrelative
-	 */
-	public function reorder_parts($parts, $beforekey = null, $reorderrelative = true)
-	{
-		require_once QA_INCLUDE_DIR . 'util/sort.php';
-
-		qa_array_reorder($this->content, $parts, $beforekey, $reorderrelative);
-	}
-
-
-	/**
-	 * Output the widgets (as provided in $this->content['widgets']) for $region and $place.
-	 * @param string $region
-	 * @param string $place
-	 */
-	public function widgets($region, $place)
-	{
-		$widgetsHere = isset($this->content['widgets'][$region][$place]) ? $this->content['widgets'][$region][$place] : array();
-		if (is_array($widgetsHere) && count($widgetsHere) > 0) {
-			$this->output('<div class="qa-widgets-' . $region . ' qa-widgets-' . $region . '-' . $place . '">');
-
-			foreach ($widgetsHere as $module) {
-				$this->output('<div class="qa-widget-' . $region . ' qa-widget-' . $region . '-' . $place . '">');
-				$module->output_widget($region, $place, $this, $this->template, $this->request, $this->content);
-				$this->output('</div>');
-			}
-
-			$this->output('</div>', '');
-		}
-	}
-
-	/**
-	 * Pre-output initialization. Immediately called after loading of the module. Content and template variables are
-	 * already setup at this point. Useful to perform layer initialization in the earliest and safest stage possible.
-	 */
-	public function initialize()
-	{
-		// abstract method
-	}
-
-	/**
-	 * Post-output cleanup. For now, check that the indenting ended right, and if not, output a warning in an HTML comment.
-	 */
-	public function finish()
-	{
-		if ($this->indent !== 0 && !$this->minifyHtml) {
-			echo "<!--\nIt's no big deal, but your HTML could not be indented properly. To fix, please:\n" .
-				"1. Use this->output() to output all HTML.\n" .
-				"2. Balance all paired tags like <td>...</td> or <div>...</div>.\n" .
-				"3. Use a slash at the end of unpaired tags like <img/> or <input/>.\n" .
-				"Thanks!\n-->\n";
-		}
-	}
-
-
-	// From here on, we have a large number of class methods which output particular pieces of HTML markup
-	// The calling chain is initiated from qa-page.php, or ajax/*.php for refreshing parts of a page,
-	// For most HTML elements, the name of the function is similar to the element's CSS class, for example:
-	// search() outputs <div class="qa-search">, q_list() outputs <div class="qa-q-list">, etc...
-
-	public function doctype()
-	{
-		$this->output('<!DOCTYPE html>');
-	}
-
-	public function html()
-	{
-		$attribution = '<!-- Powered by Question2Answer - http://www.question2answer.org/ -->';
-		$extratags = isset($this->content['html_tags']) ? $this->content['html_tags'] : '';
-
-		$this->output(
-			'<html ' . $extratags . '>',
-			$attribution
-		);
-
-		$this->head();
-		$this->body();
-
-		$this->output(
-			$attribution,
-			'</html>'
-		);
-	}
-
-	public function head()
-	{
-		$this->output(
-			'<head>',
-			'<meta charset="' . $this->content['charset'] . '"/>'
-		);
-
-		$this->head_title();
-		$this->head_metas();
-		$this->head_css();
-		$this->head_links();
-		$this->head_lines();
-		$this->head_script();
-		$this->head_custom();
-
-		$this->output('</head>');
-	}
-
-	public function head_title()
-	{
-		$pagetitle = strlen($this->request) ? strip_tags(@$this->content['title']) : '';
-		$headtitle = (strlen($pagetitle) ? "$pagetitle - " : '') . $this->content['site_title'];
-
-		$this->output('<title>' . $headtitle . '</title>');
-	}
-
-	public function head_metas()
-	{
-		if (strlen(@$this->content['description'])) {
-			$this->output('<meta name="description" content="' . $this->content['description'] . '"/>');
-		}
-
-		if (strlen(@$this->content['keywords'])) {
-			// as far as I know, meta keywords have zero effect on search rankings or listings
-			$this->output('<meta name="keywords" content="' . $this->content['keywords'] . '"/>');
-		}
-	}
-
-	public function head_links()
-	{
-		if (isset($this->content['canonical'])) {
-			$this->output('<link rel="canonical" href="' . $this->content['canonical'] . '"/>');
-		}
-
-		if (isset($this->content['feed']['url'])) {
-			$this->output('<link rel="alternate" type="application/rss+xml" href="' . $this->content['feed']['url'] . '" title="' . @$this->content['feed']['label'] . '"/>');
-		}
-
-		// convert page links to rel=prev and rel=next tags
-		if (isset($this->content['page_links']['items'])) {
-			foreach ($this->content['page_links']['items'] as $page_link) {
-				if (in_array($page_link['type'], array('prev', 'next')))
-					$this->output('<link rel="' . $page_link['type'] . '" href="' . $page_link['url'] . '" />');
-			}
-		}
-	}
-
-	public function head_script()
-	{
-		if (isset($this->content['script'])) {
-			foreach ($this->content['script'] as $scriptline) {
-				$this->output_raw($scriptline);
-			}
-		}
-	}
-
-	public function head_css()
-	{
-		$this->output('<link rel="stylesheet" href="' . $this->rooturl . $this->css_name() . '"/>');
-
-		if (isset($this->content['css_src'])) {
-			foreach ($this->content['css_src'] as $css_src) {
-				$this->output('<link rel="stylesheet" href="' . $css_src . '"/>');
-			}
-		}
-
-		if (!empty($this->content['notices'])) {
-			$this->output(
-				'<style>',
-				'.qa-body-js-on .qa-notice {display:none;}',
-				'</style>'
-			);
-		}
-	}
-
-	public function css_name()
-	{
-		return 'qa-styles.css?' . QA_VERSION;
-	}
-
-	public function head_lines()
-	{
-		if (isset($this->content['head_lines'])) {
-			foreach ($this->content['head_lines'] as $line) {
-				$this->output_raw($line);
-			}
-		}
-	}
-
-	public function head_custom()
-	{
-		// abstract method
-	}
-
-	public function body()
-	{
-		$this->output('<body');
-		$this->body_tags();
-		$this->output('>');
-
-		$this->body_script();
-		$this->body_header();
-		$this->body_content();
-		$this->body_footer();
-		$this->body_hidden();
-
-		$this->output('</body>');
-	}
-
-	public function body_hidden()
-	{
-		$this->output('<div style="position:absolute;overflow:hidden;clip:rect(0 0 0 0);height:0;width:0;margin:0;padding:0;border:0;">');
-		$this->waiting_template();
-		$this->output('</div>');
-	}
-
-	public function waiting_template()
-	{
-		$this->output('<span id="qa-waiting-template" class="qa-waiting">...</span>');
-	}
-
-	public function body_script()
-	{
-		$this->output(
-			'<script>',
-			"var b = document.getElementsByTagName('body')[0];",
-			"b.className = b.className.replace('qa-body-js-off', 'qa-body-js-on');",
-			'</script>'
-		);
-	}
-
-	public function body_header()
-	{
-		if (isset($this->content['body_header'])) {
-			$this->output_raw($this->content['body_header']);
-		}
-	}
-
-	public function body_footer()
-	{
-		if (isset($this->content['body_footer'])) {
-			$this->output_raw($this->content['body_footer']);
-		}
-	}
-
-	public function body_content()
-	{
-		$this->body_prefix();
-		$this->notices();
-
-		$extratags = isset($this->content['wrapper_tags']) ? $this->content['wrapper_tags'] : '';
-		$this->output('<div class="qa-body-wrapper"' . $extratags . '>', '');
-
-		$this->widgets('full', 'top');
-		$this->header();
-		$this->widgets('full', 'high');
-		$this->sidepanel();
-		$this->main();
-		$this->widgets('full', 'low');
-		$this->footer();
-		$this->widgets('full', 'bottom');
-
-		$this->output('</div> <!-- END body-wrapper -->');
-
-		$this->body_suffix();
-	}
-
-	public function body_tags()
-	{
-		$class = 'qa-template-' . qa_html($this->template);
-		$class .= empty($this->theme) ? '' : ' qa-theme-' . qa_html($this->theme);
-
-		if (isset($this->content['categoryids'])) {
-			foreach ($this->content['categoryids'] as $categoryid) {
-				$class .= ' qa-category-' . qa_html($categoryid);
-			}
-		}
-
-		$this->output('class="' . $class . ' qa-body-js-off"');
-	}
-
-	public function body_prefix()
-	{
-		// abstract method
-	}
-
-	public function body_suffix()
-	{
-		// abstract method
-	}
-
-	public function notices()
-	{
-		if (!empty($this->content['notices'])) {
-			foreach ($this->content['notices'] as $notice) {
-				$this->notice($notice);
-			}
-		}
-	}
-
-	public function notice($notice)
-	{
-		$this->output('<div class="qa-notice" id="' . $notice['id'] . '">');
-
-		if (isset($notice['form_tags']))
-			$this->output('<form ' . $notice['form_tags'] . '>');
-
-		$this->output_raw($notice['content']);
-
-		$this->output('<input ' . $notice['close_tags'] . ' type="submit" value="X" class="qa-notice-close-button"/> ');
-
-		if (isset($notice['form_tags'])) {
-			$this->form_hidden_elements(@$notice['form_hidden']);
-			$this->output('</form>');
-		}
-
-		$this->output('</div>');
-	}
-
-	public function header()
-	{
-		$this->output('<div class="qa-header">');
-
-		$this->logo();
-		$this->nav_user_search();
-		$this->nav_main_sub();
-		$this->header_clear();
-
-		$this->output('</div> <!-- END qa-header -->', '');
-	}
-
-	public function nav_user_search()
-	{
-		$this->nav('user');
-		$this->search();
-	}
-
-	public function nav_main_sub()
-	{
-		$this->nav('main');
-		$this->nav('sub');
-	}
-
-	public function logo()
-	{
-		$this->output(
-			'<div class="qa-logo">',
-			$this->content['logo'],
-			'</div>'
-		);
-	}
-
-	public function search()
-	{
-		$search = $this->content['search'];
-
-		$this->output(
-			'<div class="qa-search">',
-			'<form ' . $search['form_tags'] . '>',
-			@$search['form_extra']
-		);
-
-		$this->search_field($search);
-		$this->search_button($search);
-
-		$this->output(
-			'</form>',
-			'</div>'
-		);
-	}
-
-	public function search_field($search)
-	{
-		$this->output('<input type="text" ' . $search['field_tags'] . ' value="' . @$search['value'] . '" class="qa-search-field"/>');
-	}
-
-	public function search_button($search)
-	{
-		$this->output('<input type="submit" value="' . $search['button_label'] . '" class="qa-search-button"/>');
-	}
-
-	public function nav($navtype, $level = null)
-	{
-		$navigation = @$this->content['navigation'][$navtype];
-
-		if ($navtype == 'user' || isset($navigation)) {
-			$this->output('<div class="qa-nav-' . $navtype . '">');
-
-			if ($navtype == 'user')
-				$this->logged_in();
-
-			// reverse order of 'opposite' items since they float right
-			foreach (array_reverse($navigation, true) as $key => $navlink) {
-				if (@$navlink['opposite']) {
-					unset($navigation[$key]);
-					$navigation[$key] = $navlink;
-				}
-			}
-
-			$this->set_context('nav_type', $navtype);
-			$this->nav_list($navigation, 'nav-' . $navtype, $level);
-			$this->nav_clear($navtype);
-			$this->clear_context('nav_type');
-
-			$this->output('</div>');
-		}
-	}
-
-	public function nav_list($navigation, $class, $level = null)
-	{
-		$this->output('<ul class="qa-' . $class . '-list' . (isset($level) ? (' qa-' . $class . '-list-' . $level) : '') . '">');
-
-		$index = 0;
-
-		foreach ($navigation as $key => $navlink) {
-			$this->set_context('nav_key', $key);
-			$this->set_context('nav_index', $index++);
-			$this->nav_item($key, $navlink, $class, $level);
-		}
-
-		$this->clear_context('nav_key');
-		$this->clear_context('nav_index');
-
-		$this->output('</ul>');
-	}
-
-	public function nav_clear($navtype)
-	{
-		$this->output(
-			'<div class="qa-nav-' . $navtype . '-clear">',
-			'</div>'
-		);
-	}
-
-	public function nav_item($key, $navlink, $class, $level = null)
-	{
-		$suffix = strtr($key, array( // map special character in navigation key
-			'$' => '',
-			'/' => '-',
-		));
-
-		$this->output('<li class="qa-' . $class . '-item' . (@$navlink['opposite'] ? '-opp' : '') .
-			(@$navlink['state'] ? (' qa-' . $class . '-' . $navlink['state']) : '') . ' qa-' . $class . '-' . $suffix . '">');
-		$this->nav_link($navlink, $class);
-
-		$subnav = isset($navlink['subnav']) ? $navlink['subnav'] : array();
-		if (is_array($subnav) && count($subnav) > 0) {
-			$this->nav_list($subnav, $class, 1 + $level);
-		}
-
-		$this->output('</li>');
-	}
-
-	public function nav_link($navlink, $class)
-	{
-		if (isset($navlink['url'])) {
-			$this->output(
-				'<a href="' . $navlink['url'] . '" class="qa-' . $class . '-link' .
-				(@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
-				(@$navlink['favorited'] ? (' qa-' . $class . '-favorited') : '') .
-				'"' . (strlen(@$navlink['popup']) ? (' title="' . $navlink['popup'] . '"') : '') .
-				(isset($navlink['target']) ? (' target="' . $navlink['target'] . '"') : '') . '>' . $navlink['label'] .
-				'</a>'
-			);
-		} else {
+    /** @var string */
+    public $template;
+
+    /** @var array */
+    public $content;
+
+    /** @var string */
+    public $rooturl;
+
+    /** @var string */
+    public $request;
+
+    /**
+     * Whether text direction is Right-To-Left
+     *
+     * @var bool
+     */
+    public $isRTL;
+
+    /**
+     * Whether to indent the HTML
+     *
+     * @var bool
+     */
+    protected $minifyHtml;
+
+    /** @var int */
+    protected $indent = 0;
+
+    /** @var int */
+    protected $lines = 0;
+
+    /** @var array */
+    protected $context = array();
+
+    /**
+     * Whether to use new block layout in rankings (true) or fall back to tables (false)
+     * @var bool
+     */
+    protected $ranking_block_layout = false;
+
+    /**
+     * Theme 'slug' to use as CSS class
+     * @var string
+     */
+    protected $theme;
+
+
+    /**
+     * Initialize the object and assign local variables.
+     * @param string $template
+     * @param string $content
+     * @param string $rooturl
+     * @param string $request
+     */
+    public function __construct($template, $content, $rooturl, $request)
+    {
+        $this->template = $template;
+        $this->content = $content;
+        $this->rooturl = $rooturl;
+        $this->request = $request;
+        $this->isRTL = isset($content['direction']) && $content['direction'] === 'rtl';
+        $this->minifyHtml = !empty($content['options']['minify_html']);
+    }
+
+    /**
+     * @param string $template
+     * @param string $content
+     * @param string $rooturl
+     * @param string $request
+     * @deprecated PHP4-style constructor deprecated from 1.7; please use proper `__construct`
+     * function instead.
+     */
+    public function qa_html_theme_base($template, $content, $rooturl, $request)
+    {
+        self::__construct($template, $content, $rooturl, $request);
+    }
+
+
+    /**
+     * Output each element in $elements on a separate line, with automatic HTML indenting.
+     * This should be passed markup which uses the <tag/> form for unpaired tags, to help keep
+     * track of indenting, although its actual output converts these to <tag> for W3C validation.
+     * @param array $elements
+     */
+    public function output_array($elements)
+    {
+        foreach ($elements as $element) {
+            $line = str_replace('/>', '>', $element);
+
+            if ($this->minifyHtml) {
+                if (strlen($line))
+                    echo $line . "\n";
+            } else {
+                $delta = substr_count($element, '<') - substr_count($element, '<!') - 2 * substr_count($element, '</') - substr_count($element, '/>');
+
+                if ($delta < 0) {
+                    $this->indent += $delta;
+                }
+
+                echo str_repeat("\t", max(0, $this->indent)) . $line . "\n";
+
+                if ($delta > 0) {
+                    $this->indent += $delta;
+                }
+            }
+
+            $this->lines++;
+        }
+    }
+
+
+    /**
+     * Output each passed parameter on a separate line - see output_array() comments.
+     */
+    public function output() // other parameters picked up via func_get_args()
+    {
+        $args = func_get_args();
+        $this->output_array($args);
+    }
+
+
+    /**
+     * Output $html at the current indent level, but don't change indent level based on the markup within.
+     * Useful for user-entered HTML which is unlikely to follow the rules we need to track indenting.
+     * @param string $html
+     */
+    public function output_raw($html)
+    {
+        if (strlen($html))
+            echo str_repeat("\t", max(0, $this->indent)) . $html . "\n";
+    }
+
+
+    /**
+     * Output the three elements ['prefix'], ['data'] and ['suffix'] of $parts (if they're defined),
+     * with appropriate CSS classes based on $class, using $outertag and $innertag in the markup.
+     * @param array $parts
+     * @param string $class
+     * @param string $outertag
+     * @param string $innertag
+     * @param string $extraclass
+     */
+    public function output_split($parts, $class, $outertag = 'span', $innertag = 'span', $extraclass = null)
+    {
+        if (empty($parts) && strtolower($outertag) != 'td')
+            return;
+
+        $this->output(
+            '<' . $outertag . ' class="' . $class . (isset($extraclass) ? (' ' . $extraclass) : '') . '">',
+            (strlen(@$parts['prefix']) ? ('<' . $innertag . ' class="' . $class . '-pad">' . $parts['prefix'] . '</' . $innertag . '>') : '') .
+            (strlen(@$parts['data']) ? ('<' . $innertag . ' class="' . $class . '-data">' . $parts['data'] . '</' . $innertag . '>') : '') .
+            (strlen(@$parts['suffix']) ? ('<' . $innertag . ' class="' . $class . '-pad">' . $parts['suffix'] . '</' . $innertag . '>') : ''),
+            '</' . $outertag . '>'
+        );
+    }
+
+
+    /**
+     * Set some context, which be accessed via $this->context for a function to know where it's being used on the page.
+     * @param string $key
+     * @param string $value
+     */
+    public function set_context($key, $value)
+    {
+        $this->context[$key] = $value;
+    }
+
+
+    /**
+     * Clear some context (used at the end of the appropriate loop).
+     * @param string $key
+     */
+    public function clear_context($key)
+    {
+        unset($this->context[$key]);
+    }
+
+
+    /**
+     * Reorder the parts of the page according to the $parts array which contains part keys in their new order. Call this
+     * before main_parts(). See the docs for qa_array_reorder() in util/sort.php for the other parameters.
+     * @param array $parts
+     * @param string|null $beforekey
+     * @param bool $reorderrelative
+     */
+    public function reorder_parts($parts, $beforekey = null, $reorderrelative = true)
+    {
+        require_once QA_INCLUDE_DIR . 'util/sort.php';
+
+        qa_array_reorder($this->content, $parts, $beforekey, $reorderrelative);
+    }
+
+
+    /**
+     * Output the widgets (as provided in $this->content['widgets']) for $region and $place.
+     * @param string $region
+     * @param string $place
+     */
+    public function widgets($region, $place)
+    {
+        $widgetsHere = isset($this->content['widgets'][$region][$place]) ? $this->content['widgets'][$region][$place] : array();
+        if (is_array($widgetsHere) && count($widgetsHere) > 0) {
+            $this->output('<div class="qa-widgets-' . $region . ' qa-widgets-' . $region . '-' . $place . '">');
+
+            foreach ($widgetsHere as $module) {
+                $this->output('<div class="qa-widget-' . $region . ' qa-widget-' . $region . '-' . $place . '">');
+                $module->output_widget($region, $place, $this, $this->template, $this->request, $this->content);
+                $this->output('</div>');
+            }
+
+            $this->output('</div>', '');
+        }
+    }
+
+    /**
+     * Pre-output initialization. Immediately called after loading of the module. Content and template variables are
+     * already setup at this point. Useful to perform layer initialization in the earliest and safest stage possible.
+     */
+    public function initialize()
+    {
+        // abstract method
+    }
+
+    /**
+     * Post-output cleanup. For now, check that the indenting ended right, and if not, output a warning in an HTML comment.
+     */
+    public function finish()
+    {
+        if ($this->indent !== 0 && !$this->minifyHtml) {
+            echo "<!--\nIt's no big deal, but your HTML could not be indented properly. To fix, please:\n" .
+                "1. Use this->output() to output all HTML.\n" .
+                "2. Balance all paired tags like <td>...</td> or <div>...</div>.\n" .
+                "3. Use a slash at the end of unpaired tags like <img/> or <input/>.\n" .
+                "Thanks!\n-->\n";
+        }
+    }
+
+
+    // From here on, we have a large number of class methods which output particular pieces of HTML markup
+    // The calling chain is initiated from qa-page.php, or ajax/*.php for refreshing parts of a page,
+    // For most HTML elements, the name of the function is similar to the element's CSS class, for example:
+    // search() outputs <div class="qa-search">, q_list() outputs <div class="qa-q-list">, etc...
+
+    public function doctype()
+    {
+        $this->output('<!DOCTYPE html>');
+    }
+
+    public function html()
+    {
+        $attribution = '<!-- Powered by Question2Answer - http://www.question2answer.org/ -->';
+        $extratags = isset($this->content['html_tags']) ? $this->content['html_tags'] : '';
+
+        $this->output(
+            '<html ' . $extratags . '>',
+            $attribution
+        );
+
+        $this->head();
+        $this->body();
+
+        $this->output(
+            $attribution,
+            '</html>'
+        );
+    }
+
+    public function head()
+    {
+        $this->output(
+            '<head>',
+            '<meta charset="' . $this->content['charset'] . '"/>'
+        );
+
+        $this->head_title();
+        $this->head_metas();
+        $this->head_css();
+        $this->head_links();
+        $this->head_lines();
+        $this->head_script();
+        $this->head_custom();
+
+        $this->output('</head>');
+    }
+
+    public function head_title()
+    {
+        $pagetitle = strlen($this->request) ? strip_tags(@$this->content['title']) : '';
+        $headtitle = (strlen($pagetitle) ? "$pagetitle - " : '') . $this->content['site_title'];
+
+        $this->output('<title>' . $headtitle . '</title>');
+    }
+
+    public function head_metas()
+    {
+        if (strlen(@$this->content['description'])) {
+            $this->output('<meta name="description" content="' . $this->content['description'] . '"/>');
+        }
+
+        if (strlen(@$this->content['keywords'])) {
+            // as far as I know, meta keywords have zero effect on search rankings or listings
+            $this->output('<meta name="keywords" content="' . $this->content['keywords'] . '"/>');
+        }
+    }
+
+    public function head_links()
+    {
+        if (isset($this->content['canonical'])) {
+            $this->output('<link rel="canonical" href="' . $this->content['canonical'] . '"/>');
+        }
+
+        if (isset($this->content['feed']['url'])) {
+            $this->output('<link rel="alternate" type="application/rss+xml" href="' . $this->content['feed']['url'] . '" title="' . @$this->content['feed']['label'] . '"/>');
+        }
+
+        // convert page links to rel=prev and rel=next tags
+        if (isset($this->content['page_links']['items'])) {
+            foreach ($this->content['page_links']['items'] as $page_link) {
+                if (in_array($page_link['type'], array('prev', 'next')))
+                    $this->output('<link rel="' . $page_link['type'] . '" href="' . $page_link['url'] . '" />');
+            }
+        }
+    }
+
+    public function head_script()
+    {
+        if (isset($this->content['script'])) {
+            foreach ($this->content['script'] as $scriptline) {
+                $this->output_raw($scriptline);
+            }
+        }
+    }
+
+    public function head_css()
+    {
+        $this->output('<link rel="stylesheet" href="' . $this->rooturl . $this->css_name() . '"/>');
+
+        if (isset($this->content['css_src'])) {
+            foreach ($this->content['css_src'] as $css_src) {
+                $this->output('<link rel="stylesheet" href="' . $css_src . '"/>');
+            }
+        }
+
+        if (!empty($this->content['notices'])) {
+            $this->output(
+                '<style>',
+                '.qa-body-js-on .qa-notice {display:none;}',
+                '</style>'
+            );
+        }
+    }
+
+    public function css_name()
+    {
+        return 'qa-styles.css?' . QA_VERSION;
+    }
+
+    public function head_lines()
+    {
+        if (isset($this->content['head_lines'])) {
+            foreach ($this->content['head_lines'] as $line) {
+                $this->output_raw($line);
+            }
+        }
+    }
+
+    public function head_custom()
+    {
+        // abstract method
+    }
+
+    public function body()
+    {
+        $this->output('<body');
+        $this->body_tags();
+        $this->output('>');
+
+        $this->body_script();
+        $this->body_header();
+        $this->body_content();
+        $this->body_footer();
+        $this->body_hidden();
+
+        $this->output('</body>');
+    }
+
+    public function body_hidden()
+    {
+        $this->output('<div style="position:absolute;overflow:hidden;clip:rect(0 0 0 0);height:0;width:0;margin:0;padding:0;border:0;">');
+        $this->waiting_template();
+        $this->output('</div>');
+    }
+
+    public function waiting_template()
+    {
+        $this->output('<span id="qa-waiting-template" class="qa-waiting">...</span>');
+    }
+
+    public function body_script()
+    {
+        $this->output(
+            '<script>',
+            "var b = document.getElementsByTagName('body')[0];",
+            "b.className = b.className.replace('qa-body-js-off', 'qa-body-js-on');",
+            '</script>'
+        );
+    }
+
+    public function body_header()
+    {
+        if (isset($this->content['body_header'])) {
+            $this->output_raw($this->content['body_header']);
+        }
+    }
+
+    public function body_footer()
+    {
+        if (isset($this->content['body_footer'])) {
+            $this->output_raw($this->content['body_footer']);
+        }
+    }
+
+    public function body_content()
+    {
+        $this->body_prefix();
+        $this->notices();
+
+        $extratags = isset($this->content['wrapper_tags']) ? $this->content['wrapper_tags'] : '';
+        $this->output('<div class="qa-body-wrapper"' . $extratags . '>', '');
+
+        $this->widgets('full', 'top');
+        $this->header();
+        $this->widgets('full', 'high');
+        $this->sidepanel();
+        $this->main();
+        $this->widgets('full', 'low');
+        $this->footer();
+        $this->widgets('full', 'bottom');
+
+        $this->output('</div> <!-- END body-wrapper -->');
+
+        $this->body_suffix();
+    }
+
+    public function body_tags()
+    {
+        $class = 'qa-template-' . qa_html($this->template);
+        $class .= empty($this->theme) ? '' : ' qa-theme-' . qa_html($this->theme);
+
+        if (isset($this->content['categoryids'])) {
+            foreach ($this->content['categoryids'] as $categoryid) {
+                $class .= ' qa-category-' . qa_html($categoryid);
+            }
+        }
+
+        $this->output('class="' . $class . ' qa-body-js-off"');
+    }
+
+    public function body_prefix()
+    {
+        // abstract method
+    }
+
+    public function body_suffix()
+    {
+        // abstract method
+    }
+
+    public function notices()
+    {
+        if (!empty($this->content['notices'])) {
+            foreach ($this->content['notices'] as $notice) {
+                $this->notice($notice);
+            }
+        }
+    }
+
+    public function notice($notice)
+    {
+        $this->output('<div class="qa-notice" id="' . $notice['id'] . '">');
+
+        if (isset($notice['form_tags']))
+            $this->output('<form ' . $notice['form_tags'] . '>');
+
+        $this->output_raw($notice['content']);
+
+        $this->output('<input ' . $notice['close_tags'] . ' type="submit" value="X" class="qa-notice-close-button"/> ');
+
+        if (isset($notice['form_tags'])) {
+            $this->form_hidden_elements(@$notice['form_hidden']);
+            $this->output('</form>');
+        }
+
+        $this->output('</div>');
+    }
+
+    public function header()
+    {
+        $this->output('<div class="qa-header">');
+
+        $this->logo();
+        $this->nav_user_search();
+        $this->nav_main_sub();
+        $this->header_clear();
+
+        $this->output('</div> <!-- END qa-header -->', '');
+    }
+
+    public function nav_user_search()
+    {
+        $this->nav('user');
+        $this->search();
+    }
+
+    public function nav_main_sub()
+    {
+        $this->nav('main');
+        $this->nav('sub');
+    }
+
+    public function logo()
+    {
+        $this->output(
+            '<div class="qa-logo">',
+            $this->content['logo'],
+            '</div>'
+        );
+    }
+
+    public function search()
+    {
+        $search = $this->content['search'];
+
+        $this->output(
+            '<div class="qa-search">',
+            '<form ' . $search['form_tags'] . '>',
+            @$search['form_extra']
+        );
+
+        $this->search_field($search);
+        $this->search_button($search);
+
+        $this->output(
+            '</form>',
+            '</div>'
+        );
+    }
+
+    public function search_field($search)
+    {
+        $this->output('<input type="text" ' . $search['field_tags'] . ' value="' . @$search['value'] . '" class="qa-search-field"/>');
+    }
+
+    public function search_button($search)
+    {
+        $this->output('<input type="submit" value="' . $search['button_label'] . '" class="qa-search-button"/>');
+    }
+
+    public function nav($navtype, $level = null)
+    {
+        $navigation = @$this->content['navigation'][$navtype];
+
+        if ($navtype == 'user' || isset($navigation)) {
+            $this->output('<div class="qa-nav-' . $navtype . '">');
+
+            if ($navtype == 'user')
+                $this->logged_in();
+
+            // reverse order of 'opposite' items since they float right
+            foreach (array_reverse($navigation, true) as $key => $navlink) {
+                if (@$navlink['opposite']) {
+                    unset($navigation[$key]);
+                    $navigation[$key] = $navlink;
+                }
+            }
+
+            $this->set_context('nav_type', $navtype);
+            $this->nav_list($navigation, 'nav-' . $navtype, $level);
+            $this->nav_clear($navtype);
+            $this->clear_context('nav_type');
+
+            $this->output('</div>');
+        }
+    }
+
+    public function nav_list($navigation, $class, $level = null)
+    {
+        $this->output('<ul class="qa-' . $class . '-list' . (isset($level) ? (' qa-' . $class . '-list-' . $level) : '') . '">');
+
+        $index = 0;
+
+        foreach ($navigation as $key => $navlink) {
+            $this->set_context('nav_key', $key);
+            $this->set_context('nav_index', $index++);
+            $this->nav_item($key, $navlink, $class, $level);
+        }
+
+        $this->clear_context('nav_key');
+        $this->clear_context('nav_index');
+
+        $this->output('</ul>');
+    }
+
+    public function nav_clear($navtype)
+    {
+        $this->output(
+            '<div class="qa-nav-' . $navtype . '-clear">',
+            '</div>'
+        );
+    }
+
+    public function nav_item($key, $navlink, $class, $level = null)
+    {
+        $suffix = strtr($key, array( // map special character in navigation key
+            '$' => '',
+            '/' => '-',
+        ));
+
+        $this->output('<li class="qa-' . $class . '-item' . (@$navlink['opposite'] ? '-opp' : '') .
+            (@$navlink['state'] ? (' qa-' . $class . '-' . $navlink['state']) : '') . ' qa-' . $class . '-' . $suffix . '">');
+        $this->nav_link($navlink, $class);
+
+        $subnav = isset($navlink['subnav']) ? $navlink['subnav'] : array();
+        if (is_array($subnav) && count($subnav) > 0) {
+            $this->nav_list($subnav, $class, 1 + $level);
+        }
+
+        $this->output('</li>');
+    }
+
+    public function nav_link($navlink, $class)
+    {
+        if (isset($navlink['url'])) {
+            $this->output(
+                '<a href="' . $navlink['url'] . '" class="qa-' . $class . '-link' .
+                (@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
+                (@$navlink['favorited'] ? (' qa-' . $class . '-favorited') : '') .
+                '"' . (strlen(@$navlink['popup']) ? (' title="' . $navlink['popup'] . '"') : '') .
+                (isset($navlink['target']) ? (' target="' . $navlink['target'] . '"') : '') . '>' . $navlink['label'] .
+                '</a>'
+            );
+        } else {
             if (strcmp($navlink['label'], "问答挑战") == 0) {
                 $this->output(
                     '<span class="qa-' . $class . '-nolink-challenge' . (@$navlink['selected'] ? (' qa-' . $class . '-selected') : '') .
@@ -696,59 +696,75 @@ class qa_html_theme_base
                     '>' . $navlink['label'] . '</span>'
                 );
             }
-		}
+        }
 
-		if (strlen(@$navlink['note']))
-			$this->output('<span class="qa-' . $class . '-note">' . $navlink['note'] . '</span>');
-	}
+        if (strlen(@$navlink['note']))
+            $this->output('<span class="qa-' . $class . '-note">' . $navlink['note'] . '</span>');
+    }
 
-	public function logged_in()
-	{
-		$this->output_split(@$this->content['loggedin'], 'qa-logged-in', 'div');
-	}
+    public function logged_in()
+    {
+        $this->output_split(@$this->content['loggedin'], 'qa-logged-in', 'div');
+    }
 
-	public function header_clear()
-	{
-		$this->output(
-			'<div class="qa-header-clear">',
-			'</div>'
-		);
-	}
+    public function header_clear()
+    {
+        $this->output(
+            '<div class="qa-header-clear">',
+            '</div>'
+        );
+    }
 
-	public function sidepanel()
-	{
-		$this->output('<div class="qa-sidepanel">');
-		$this->widgets('side', 'top');
-		$this->sidebar();
-		$this->widgets('side', 'high');
-		$this->widgets('side', 'low');
-		$this->output_raw(@$this->content['sidepanel']);
-		$this->feed();
-		$this->widgets('side', 'bottom');
-		$this->output('</div>', '');
-	}
+    public function sidepanel()
+    {
+        $this->output('<div class="qa-sidepanel">');
+        $this->widgets('side', 'top');
+        $this->sidebar();
+        $this->widgets('side', 'high');
+        $this->widgets('side', 'low');
+        $this->output_raw(@$this->content['sidepanel']);
+        $this->feed();
+        $this->widgets('side', 'bottom');
+        $this->output('</div>', '');
+    }
 
-	public function sidebar()
-	{
-		$sidebar = @$this->content['sidebar'];
+    public function sidebar()
+    {
+        $sidebar = @$this->content['sidebar'];
 
-		if (!empty($sidebar)) {
-			$this->output('<div class="qa-sidebar">');
-			$this->output_raw($sidebar);
-			$this->output('</div>', '');
-		}
-	}
+        if (!empty($sidebar)) {
+            $this->output('<div class="qa-sidebar">');
+            $this->output_raw($sidebar);
+            $this->output('</div>', '');
+        }
+    }
 
-	public function feed()
-	{
-		$feed = @$this->content['feed'];
+    public function feed()
+    {
+        $feed = @$this->content['feed'];
 
-		if (!empty($feed)) {
-			$this->output('<div class="qa-feed">');
-			$this->output('<a href="' . $feed['url'] . '" class="qa-feed-link">' . @$feed['label'] . '</a>');
-			$this->output('</div>');
-		}
-	}
+        if (!empty($feed)) {
+            $this->output('<div class="qa-feed">');
+            $this->output('<a href="' . $feed['url'] . '" class="qa-feed-link">' . @$feed['label'] . '</a>');
+            $this->output('</div>');
+        }
+    }
+
+    public function taskList()
+    {
+        $taskList = @$this->content['side_task'];
+
+        if (!empty($taskList) && strtolower(qa_request()) != 'task') {
+            $this->output('<div class="qa-sidebar-task">');
+            $this->output('<h2>当前任务</h2>');
+            foreach ($taskList as $key => $value) {
+                $this->output('<li>' . $value . '</li>');
+            }
+            $this->output('<br>');
+            $this->output('<a href="./index.php?qa=task">点击查看任务详情</a>');
+            $this->output('</div>', '');
+        }
+    }
 
 	public function main()
 	{

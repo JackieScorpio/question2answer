@@ -111,5 +111,7 @@ function qa_page_routing()
 		'unanswered/' => 'pages/unanswered.php',
 		'unsubscribe' => 'pages/unsubscribe.php',
 		'updates' => 'pages/updates.php',
+        'task' => 'pages/task.php',
+        'taskman' => 'pages/task-management.php'
 	);
 }

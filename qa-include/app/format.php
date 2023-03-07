@@ -1499,6 +1499,11 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
 			'label' => qa_lang_html('misc/nav_user_as'),
 			'url' => qa_path_html('user/' . $handle . '/answers'),
 		),
+
+        'task' => array(
+            'label' => qa_lang_html('misc/nav_user_task'),
+            'url' => qa_path_html('task')
+        )
 	);
 
 	if (isset($navigation[$selected]))
@@ -1510,8 +1515,10 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
 	if (QA_FINAL_EXTERNAL_USERS || !$ismyuser)
 		unset($navigation['account']);
 
-	if (!$ismyuser)
-		unset($navigation['favorites']);
+	if (!$ismyuser) {
+        unset($navigation['favorites']);
+        unset($navigation['task']);
+    }
 
 	if (QA_FINAL_EXTERNAL_USERS || !$ismyuser || !qa_opt('allow_private_messages') || !qa_opt('show_message_history'))
 		unset($navigation['messages']);

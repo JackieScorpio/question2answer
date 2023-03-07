@@ -2168,6 +2168,46 @@ input[type="submit"], button {
 	border-bottom: 0;
 }
 
+/*------[ task ]------*/
+.qa-task-list {
+	display: block;
+	background-color: #cef5f0;
+	background-size: 0 2px;
+	background-repeat: no-repeat;
+	background-position: left bottom;
+	position: relative;
+	border-top: 1px solid #eee;
+	font-family: "Space Mono";
+	font-weight: 400;
+	height: 50px;
+	padding: 0 20px;
+	line-height: 50px;
+}
+
+.qa-task-list-finish {
+	display: block;
+	background-color: #b5fcba;
+	background-size: 0 2px;
+	background-repeat: no-repeat;
+	background-position: left bottom;
+	position: relative;
+	border-top: 1px solid #eee;
+	font-family: "Space Mono";
+	font-weight: 400;
+	height: 50px;
+	padding: 0 20px;
+	line-height: 50px;
+}
+
+.qa-task-list-item {
+	position: relative;
+	font-family: "Space Mono";
+}
+
+.qa-task-list:hover {
+	background-color: #a2f3e9;
+}
+
 /*------[ q-view ]------*/
 .qa-form-light-button {
 	-webkit-appearance: none;
@@ -2948,6 +2988,11 @@ input[type="submit"], button {
 	margin-bottom: 5px;
 	background: #34495e;
 	color: #fff;
+}
+.qa-sidebar-task {
+	padding: 20px;
+	margin-bottom: 5px;
+	background: #ffffff;
 }
 .qa-sidebar a {
 	color: #fff;
