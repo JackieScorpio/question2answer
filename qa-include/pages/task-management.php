@@ -93,7 +93,7 @@ $qa_content['form'] = array(
     'buttons' => array(
         'save' => array(
             'tags' => 'name="dosaveoptions"',
-            'label' => qa_lang_html('main/save_button'),
+            'label' => '添加',
         ),
     ),
 );

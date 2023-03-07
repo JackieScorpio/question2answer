@@ -52,3 +52,37 @@
 ## qa-config.php
     unanswer.php page 无法打开 bug 修复
         - 此处设置为true: define('QA_ALLOW_UNINDEXED_QUERIES', true);
+
+# 增加任务系统
+
+## 建表语句
+```sql
+create table q2a.qa_task
+(
+id          int auto_increment
+primary key,
+started     datetime        not null,
+ended       datetime        not null,
+description varchar(128)    not null,
+count       int default 1   not null,
+reward      int default 500 null,
+cat         varchar(64)     null
+);
+
+create table q2a.qa_taskfinish
+(
+    id      int unsigned auto_increment
+        primary key,
+    user_id int unsigned not null,
+    task_id int          not null
+);
+```
+## 管理员操作
+
+- 进入管理界面
+- 点击页面
+- 点击添加链接
+- 链接名：任务管理 
+- 位置：在顶部选项卡之后 
+- 可见：管理员 
+- 链接URL：http://{ip}/index.php?qa=taskman
