@@ -77,7 +77,16 @@ create table q2a.qa_taskfinish
     task_id int          not null
 );
 ```
-## 管理员操作
+
+## 管理员操作 - 增加eventlog
+
+- 进入管理页面
+- 点击插件
+- 点击Event Logger的选项
+- 点选Log events to qa_eventlog database table
+- 保存
+
+## 管理员操作 - 增加任务管理页面
 
 - 进入管理界面
 - 点击页面
@@ -86,3 +95,30 @@ create table q2a.qa_taskfinish
 - 位置：在顶部选项卡之后 
 - 可见：管理员 
 - 链接URL：http://{ip}/index.php?qa=taskman
+
+# 增加徽章系统
+
+## 建表语句
+```sql
+create table qa_badge
+(
+id          int auto_increment
+primary key,
+name        varchar(128) not null,
+level_1     int          null,
+level_2     int          null,
+level_3     int          null,
+description varchar(128) null
+);
+```
+## sql语句
+```sql
+insert into qa_badge (id, name, level_1, level_2, level_3, description)
+values  (1, '知无不言', 1, 5, 10, '回答问题'),
+        (2, '好奇宝宝', 1, 5, 10, '提出问题'),
+        (3, '有口皆碑', 1, 5, 10, '获得点赞数'),
+        (4, '乐于交流', 1, 5, 10, '参与评论数'),
+        (5, '表示赞同', 1, 5, 10, '进行投票数'),
+        (6, '优质回答', 1, 5, 10, '回答被采纳'),
+        (7, '在线时长', 5, 30, 60, '在线分钟数');
+```

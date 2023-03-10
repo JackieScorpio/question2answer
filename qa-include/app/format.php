@@ -1503,6 +1503,11 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
         'task' => array(
             'label' => qa_lang_html('misc/nav_user_task'),
             'url' => qa_path_html('task')
+        ),
+
+        'badge' => array(
+            'label' => qa_lang_html('misc/nav_user_badge'),
+            'url' => qa_path_html('badge')
         )
 	);
 

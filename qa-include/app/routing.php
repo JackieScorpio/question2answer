@@ -112,6 +112,7 @@ function qa_page_routing()
 		'unsubscribe' => 'pages/unsubscribe.php',
 		'updates' => 'pages/updates.php',
         'task' => 'pages/task.php',
-        'taskman' => 'pages/task-management.php'
+        'taskman' => 'pages/task-management.php',
+        'badge' => 'pages/badge.php',
 	);
 }

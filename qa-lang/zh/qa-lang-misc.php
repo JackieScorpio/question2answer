@@ -76,6 +76,7 @@ return array(
     'nav_user_activity' => "近期动态",
     'nav_user_as' => "所有回答",
     'nav_user_task' => "任务",
+    'nav_user_badge' => "徽章",
     'nav_user_pms' => "私信",
     'nav_user_qs' => "所有问题",
     'nav_user_wall' => "墙",

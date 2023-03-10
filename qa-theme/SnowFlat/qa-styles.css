@@ -2208,6 +2208,41 @@ input[type="submit"], button {
 	background-color: #a2f3e9;
 }
 
+/*------[ badge ]------*/
+.qa-badge-list {
+	display: block;
+	border-radius: 25px;
+	background-color: #ffffff;
+	background-size: 0 2px;
+	background-repeat: no-repeat;
+	position: relative;
+	font-family: "Space Mono";
+	font-weight: 400;
+	height: 50px;
+	line-height: 50px;
+}
+.qa-badge-list-item {
+	position: relative;
+	font-family: "Space Mono";
+}
+
+.qa-badge-list:hover {
+	background-color: #a2f3e9;
+}
+
+.qa-form-badge-data {
+	line-height: 50px;
+}
+
+.g-progress {
+	border-radius: 25px;
+	background: linear-gradient(90deg, #ace5de, #49e8e8 var(--progress), transparent 0);
+	padding: 0 20px;
+	text-align: left;
+	font-family: Georgia, serif;
+	vertical-align: middle;
+}
+
 /*------[ q-view ]------*/
 .qa-form-light-button {
 	-webkit-appearance: none;
@@ -3523,6 +3558,8 @@ input[type="submit"], button {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+
+
 
 .icon-chat:before { content: '\e800'; }
 .icon-help:before { content: '\e801'; }
