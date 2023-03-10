@@ -1032,16 +1032,19 @@ class UserProfile extends BaseController
         if (!empty($badge_info)) {
             foreach ($badge_info as $key => $value) {
                 $badge_level = $this->get_badge_level($value, $userpoints, $useraccount);
-                if ($badge_level == 0) {
-                    continue;
-                }
                 $badge_name = 'badge' . $value['id'];
                 $qa_content['form_profile1']['fields'][$badge_name]['type'] = 'custom';
                 $qa_content['form_profile1']['fields'][$badge_name]['html'] = '<span style="font-size:15px;vertical-align:middle;" title="' . $value['description'] . '">' . $value['name'] . ' </span>';
-                for ($i = 1; $i <= $badge_level; ++$i) {
+                for ($i = 1; $i <= 3; ++$i) {
+                    if ($i <= $badge_level)
                     $qa_content['form_profile1']['fields'][$badge_name]['html'] =
                         $qa_content['form_profile1']['fields'][$badge_name]['html'] .
                         '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px" title="达成' . $value['level_' . $i] . '次">';
+                    else {
+                        $qa_content['form_profile1']['fields'][$badge_name]['html'] =
+                            $qa_content['form_profile1']['fields'][$badge_name]['html'] .
+                            '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px;filter:grayscale(100%)" title="达成' . $value['level_' . $i] . '次">';
+                    }
                 }
             }
             $qa_content['form_profile1']['fields']['badge_url']['type'] = 'custom';

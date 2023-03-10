@@ -608,6 +608,8 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
                     $levels[$level] += 1;
                 }
                 $fields['who']['title'] = '';
+                $levels[1] += $levels[2] + $levels[3];
+                $levels[2] += $levels[3];
                 for ($i = 1; $i <= 3; ++$i) {
                     if ($levels[$i] > 0) {
                         $fields['who']['title'] = $fields['who']['title'] . $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 15px;height: 15px"> ';
