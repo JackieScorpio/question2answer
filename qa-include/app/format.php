@@ -598,9 +598,24 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
 			if (@$options['pointsview'])
 				$fields['who']['points'] = ($post['points'] == 1) ? qa_lang_html_sub_split('main/1_point', '1', '1')
 					: qa_lang_html_sub_split('main/x_points', qa_format_number($post['points'], 0, true));
-
-			if (isset($options['pointstitle']))
-				$fields['who']['title'] = qa_get_points_title_html($post['points'], $options['pointstitle']);
+            $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
+            $useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT totalactiontime FROM ^users WHERE userid = #', @$post['userid']));
+            $userpoints = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^userpoints WHERE userid = #', @$post['userid']));
+            if (!empty($userpoints) && !empty($badgeInfo)) {
+                $levels = array(0,0,0,0);
+                foreach ($badgeInfo as $value) {
+                    $level = get_badge_level($value, $userpoints, $useraccount);
+                    $levels[$level] += 1;
+                }
+                $fields['who']['title'] = '';
+                for ($i = 1; $i <= 3; ++$i) {
+                    if ($levels[$i] > 0) {
+                        $fields['who']['title'] = $fields['who']['title'] . $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 15px;height: 15px"> ';
+                    }
+                }
+            }
+//			if (isset($options['pointstitle']))
+//				$fields['who']['title'] = qa_get_points_title_html($post['points'], $options['pointstitle']);
 		}
 
 		if (isset($post['level']))
@@ -677,6 +692,40 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
 	// That's it!
 
 	return $fields;
+}
+
+function get_badge_level($value, $userpoints, $useraccount) {
+    $number = 0;
+    if ($value['id'] == 1) {
+        // 知无不言
+        $number = $userpoints['aposts'];
+    } elseif ($value['id'] == 2) {
+        // 好奇宝宝
+        $number = $userpoints['qposts'];
+    } elseif ($value['id'] == 3) {
+        // 有口皆碑
+        $number = $userpoints['upvoteds'];
+    } elseif ($value['id'] == 4) {
+        // 乐于交流
+        $number = $userpoints['cposts'];
+    } elseif ($value['id'] == 5) {
+        // 表示赞同
+        $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+    } elseif ($value['id'] == 6) {
+        // 优质回答
+        $number = $userpoints['aselecteds'];
+    } elseif ($value['id'] == 7) {
+        // 在线时长
+        $number = ((int)$useraccount['totalactiontime']) / 60;
+    }
+    if ($number >= $value['level_3']) {
+        return 3;
+    } elseif ($number >= $value['level_2']) {
+        return 2;
+    } elseif  ($number >= $value['level_1']) {
+        return 1;
+    }
+    return 0;
 }
 
 
