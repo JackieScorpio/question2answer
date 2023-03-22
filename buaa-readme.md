@@ -132,3 +132,6 @@ values  (1, '灵光一闪', '乐于助人', '知无不言', '回答问题', 1, 5
 ```
 
 
+
+## tips
+1. php version 7.4 is recommended, this can avoid bugs like categories can't be created(php version 8.0).
