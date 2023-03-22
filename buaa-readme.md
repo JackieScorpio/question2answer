@@ -97,6 +97,9 @@ create table q2a.qa_taskfinish
 - 链接URL：http://{ip}/index.php?qa=taskman
 
 # 增加徽章系统
+## 代码配置 重要！！！！
+### qa-src/Controllers/User/UserPosts.php文件
+代码第 444 行 categoryid 需改为 问答挑战类别 对应的id。
 
 ## 建表语句
 ```sql
@@ -126,3 +129,5 @@ values  (1, '灵光一闪', '乐于助人', '知无不言', '回答问题', 1, 5
         (8, '快人一步', '先驱', '开拓者', '首答次数', 1, 5, 10),
         (9, '眼前一亮', '焦点', '群体之声', '问题被点击', 1, 5, 10);
 ```
+
+
