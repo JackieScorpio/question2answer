@@ -599,7 +599,7 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
 				$fields['who']['points'] = ($post['points'] == 1) ? qa_lang_html_sub_split('main/1_point', '1', '1')
 					: qa_lang_html_sub_split('main/x_points', qa_format_number($post['points'], 0, true));
             $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
-            $useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT totalactiontime FROM ^users WHERE userid = #', @$post['userid']));
+            $useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^users WHERE userid = #', @$post['userid']));
             $userpoints = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^userpoints WHERE userid = #', @$post['userid']));
             if (!empty($userpoints) && !empty($badgeInfo)) {
                 $levels = array(0,0,0,0);
