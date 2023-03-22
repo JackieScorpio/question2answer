@@ -921,3 +921,43 @@ function updateBadge(obj) {
 		);
 	}
 }
+
+// task management
+function deleteTask(obj) {
+	if (confirm("是否删除该条记录?")) {
+		const id = obj.parentNode.parentNode.childNodes[0].textContent;
+		var params = {};
+		params.id = id;
+		params.delete_task = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('删除成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+function updateTask(obj) {
+	const id = obj.parentNode.parentNode.childNodes[0].textContent;
+	const thistd = obj.parentNode;
+	const rewardtd = thistd.previousSibling;
+	const counttd = rewardtd.previousSibling;
+
+	rewardtd.innerHTML = "<input id = 'task-reward' type='text' style='width: 40px' value='" + rewardtd.innerText + "'/>";
+	counttd.innerHTML = "<input id = 'task-count' type='text' style='width: 40px' value='" + counttd.innerText + "'>";
+	thistd.innerHTML = "<button class = \"badge-management-update-btn\">保存</button>";
+	thistd.childNodes[0].onclick = function() {
+		var params = {};
+		params.count = document.getElementById("task-count").value;
+		params.reward = document.getElementById("task-reward").value;
+		params.id = id;
+		params.update_task = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('修改成功');
+				location.reload();
+			}
+		);
+	}
+}

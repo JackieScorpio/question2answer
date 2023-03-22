@@ -85,5 +85,4 @@ while ($row = $result->fetch_assoc()) {
     $users[] = $row;
 }
 $data['users'] = $users;
-
 echo json_encode($data);

@@ -136,5 +136,40 @@ $qa_content['form']['fields']['task_finish_reward'] = array(
     'tags' => 'name="task_finish_reward"',
 );
 
+$current_time = date("Y-m-d H:i:s");
+$tasks = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^task WHERE started <= # AND ended >= #', $current_time, $current_time));
+
+$qa_content['custom'] = '<div>
+  <h2>当前任务</h2>
+  <table class="badge-management-table">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>开始时间</th>
+      <th>结束时间</th>
+      <th>描述</th>
+      <th>所需次数</th>
+      <th>奖励</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>';
+
+foreach ($tasks as $task) {
+    $qa_content['custom'] .= '<tr>';
+    $qa_content['custom'] .= '<td>' . $task['id'] . '</td>';
+    $qa_content['custom'] .= '<td>' . $task['started'] . '</td>';
+    $qa_content['custom'] .= '<td>' . $task['ended'] . '</td>';
+    $qa_content['custom'] .= '<td>' . $task['description'] . '</td>';
+    $qa_content['custom'] .= '<td>' . $task['count'] . '</td>';
+    $qa_content['custom'] .= '<td>' . $task['reward'] . '</td>';
+    $qa_content['custom'] .= '<td><button class = "badge-management-delete-btn" onclick="deleteTask(this)">删除</button><button class = "badge-management-update-btn" onclick="updateTask(this)">修改</button></td>';
+    $qa_content['custom'] .= '</tr>';
+}
+
+$qa_content['custom'] .= '</tbody>
+</table>
+</div>';
+
 
 return $qa_content;
