@@ -345,6 +345,9 @@ GROUP BY parentid)', $useraccount['userid']));
         } elseif ($id == 9) {
             // 问题被点击数
             $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+        } elseif ($id == 10) {
+            // 登录天数
+            $number = (int)$useraccount['logindays'];
         }
         return $number;
     }
