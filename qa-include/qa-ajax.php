@@ -74,6 +74,7 @@ $routing = array(
 	'click_wall' => 'click-wall.php',
 	'click_pm' => 'click-pm.php',
 	'click_question_times' => 'click-question-times.php',
+    'badge_change' => 'badge-change.php',
 );
 
 $operation = qa_post_text('qa_operation');

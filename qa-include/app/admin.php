@@ -376,6 +376,11 @@ function qa_admin_sub_navigation()
 			'label' => qa_lang_html('admin/plugins_title'),
 			'url' => qa_path_html('admin/plugins'),
 		);
+
+        $navigation['admin/badge'] = array(
+            'label' => qa_lang_html('admin/badge_title'),
+            'url' => qa_path_html('badgeman'),
+        );
 	}
 
 	if (!qa_user_maximum_permit_error('permit_moderate')) {

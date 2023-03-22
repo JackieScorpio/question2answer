@@ -102,23 +102,27 @@ create table q2a.qa_taskfinish
 ```sql
 create table qa_badge
 (
-id          int auto_increment
-primary key,
-name        varchar(128) not null,
-level_1     int          null,
-level_2     int          null,
-level_3     int          null,
-description varchar(128) null
+    id          int auto_increment
+        primary key,
+    name1       varchar(128)                 not null,
+    name2       varchar(128) default 'name2' not null,
+    name3       varchar(128) default 'name3' not null,
+    description varchar(128)                 null,
+    level_1     int                          null,
+    level_2     int                          null,
+    level_3     int                          null
 );
 ```
 ## sql语句
 ```sql
-insert into qa_badge (id, name, level_1, level_2, level_3, description)
-values  (1, '知无不言', 1, 5, 10, '回答问题'),
-        (2, '好奇宝宝', 1, 5, 10, '提出问题'),
-        (3, '有口皆碑', 1, 5, 10, '获得点赞数'),
-        (4, '乐于交流', 1, 5, 10, '参与评论数'),
-        (5, '表示赞同', 1, 5, 10, '进行投票数'),
-        (6, '优质回答', 1, 5, 10, '回答被采纳'),
-        (7, '在线时长', 5, 30, 60, '在线分钟数');
+insert into qa_badge (id, name1, name2, name3, description, level_1, level_2, level_3)
+values  (1, '灵光一闪', '乐于助人', '知无不言', '回答问题', 1, 5, 20),
+        (2, '好奇宝宝', '求知达人', '探索大师', '提出问题', 1, 5, 10),
+        (3, '得到认可', '备受赞誉', '有口皆碑', '获得点赞', 1, 5, 10),
+        (4, '初窥门径', '乐于交流', '畅所欲言', '参与评论', 1, 5, 10),
+        (5, '表示赞同', '赞不绝口', '点赞狂魔', '进行点赞', 1, 5, 10),
+        (6, '值得信赖', '专业可靠', '权威专家', '回答被采纳', 1, 5, 10),
+        (7, '初来乍到', '驾轻就熟', '资深元老', '在线分钟数', 5, 30, 60),
+        (8, '快人一步', '先驱', '开拓者', '首答次数', 1, 5, 10),
+        (9, '眼前一亮', '焦点', '群体之声', '问题被点击', 1, 5, 10);
 ```

@@ -3599,3 +3599,87 @@ input[type="submit"], button {
 .icon-reply:before { content: '\e823'; }
 .icon-power:before { content: '\e824'; }
 .icon-link:before { content: '\e825'; }
+
+/*------[ badge-management ]------*/
+table.badge-management-table {
+	border-collapse: collapse;
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	font-size: 1rem;
+	font-family: Arial, sans-serif;
+	background-color: #fff;
+}
+
+table.badge-management-table thead {
+	background-color: #f2f2f2;
+}
+
+table.badge-management-table th, table.badge-management-table td {
+	text-align: left;
+	padding: 0.5rem;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+table.badge-management-table th {
+	font-weight: bold;
+}
+
+table.badge-management-table tbody tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+.badge-management-delete-btn {
+	background-color: red;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
+
+.badge-management-update-btn {
+	background-color: green;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
+
+.badge {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 20px;
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 10px;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+	transition: all 0.3s ease-in-out;
+}
+.badge:hover {
+	transform: scale(1.05);
+	box-shadow: 0px 0px 20px rgba(0,0,0,0.4);
+}
+.badge img {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	border-radius: 50%;
+	margin-bottom: 10px;
+}
+.badge h2 {
+	font-size: 18px;
+	color: #333;
+	margin-bottom: 5px;
+}
+.badge p {
+	font-size: 14px;
+	color: #666;
+	text-align: center;
+}
+.badge-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}

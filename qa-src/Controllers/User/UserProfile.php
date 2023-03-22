@@ -1022,34 +1022,34 @@ class UserProfile extends BaseController
         // Badge System
 
 
-        $qa_content['form_profile1'] = array(
-            'title' => '<span id = "badge">徽章</span>',
-            'style' => 'badge'
-        );
-        $badge_info = qa_db_read_all_assoc(qa_db_query_sub(
-            'SELECT * FROM ^badge'
-        ));
-        if (!empty($badge_info)) {
-            foreach ($badge_info as $key => $value) {
-                $badge_level = $this->get_badge_level($value, $userpoints, $useraccount);
-                $badge_name = 'badge' . $value['id'];
-                $qa_content['form_profile1']['fields'][$badge_name]['type'] = 'custom';
-                $qa_content['form_profile1']['fields'][$badge_name]['html'] = '<span style="font-size:15px;vertical-align:middle;" title="' . $value['description'] . '">' . $value['name'] . ' </span>';
-                for ($i = 1; $i <= 3; ++$i) {
-                    if ($i <= $badge_level)
-                    $qa_content['form_profile1']['fields'][$badge_name]['html'] =
-                        $qa_content['form_profile1']['fields'][$badge_name]['html'] .
-                        '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px" title="达成' . $value['level_' . $i] . '次">';
-                    else {
-                        $qa_content['form_profile1']['fields'][$badge_name]['html'] =
-                            $qa_content['form_profile1']['fields'][$badge_name]['html'] .
-                            '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px;filter:grayscale(100%)" title="达成' . $value['level_' . $i] . '次">';
-                    }
-                }
-            }
-            $qa_content['form_profile1']['fields']['badge_url']['type'] = 'custom';
-            $qa_content['form_profile1']['fields']['badge_url']['html'] = '<a href=' . qa_path_html('badge') . '>徽章详情</a>';
-        }
+//        $qa_content['form_profile1'] = array(
+//            'title' => '<span id = "badge">徽章</span>',
+//            'style' => 'badge'
+//        );
+//        $badge_info = qa_db_read_all_assoc(qa_db_query_sub(
+//            'SELECT * FROM ^badge'
+//        ));
+//        if (!empty($badge_info)) {
+//            foreach ($badge_info as $key => $value) {
+//                $badge_level = $this->get_badge_level($value, $userpoints, $useraccount);
+//                $badge_name = 'badge' . $value['id'];
+//                $qa_content['form_profile1']['fields'][$badge_name]['type'] = 'custom';
+//                $qa_content['form_profile1']['fields'][$badge_name]['html'] = '<span style="font-size:15px;vertical-align:middle;" title="' . $value['description'] . '">' . $value['name'] . ' </span>';
+//                for ($i = 1; $i <= 3; ++$i) {
+//                    if ($i <= $badge_level)
+//                    $qa_content['form_profile1']['fields'][$badge_name]['html'] =
+//                        $qa_content['form_profile1']['fields'][$badge_name]['html'] .
+//                        '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px" title="达成' . $value['level_' . $i] . '次">';
+//                    else {
+//                        $qa_content['form_profile1']['fields'][$badge_name]['html'] =
+//                            $qa_content['form_profile1']['fields'][$badge_name]['html'] .
+//                            '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 50px;height: 50px;filter:grayscale(100%)" title="达成' . $value['level_' . $i] . '次">';
+//                    }
+//                }
+//            }
+//            $qa_content['form_profile1']['fields']['badge_url']['type'] = 'custom';
+//            $qa_content['form_profile1']['fields']['badge_url']['html'] = '<a href=' . qa_path_html('badge') . '>徽章详情</a>';
+//        }
 
 
 		// Sub menu for navigation in user pages
@@ -1061,37 +1061,37 @@ class UserProfile extends BaseController
 		return $qa_content;
 	}
 
-    function get_badge_level($value, $userpoints, $useraccount) {
-        $number = 0;
-        if ($value['id'] == 1) {
-            // 知无不言
-            $number = $userpoints['aposts'];
-        } elseif ($value['id'] == 2) {
-            // 好奇宝宝
-            $number = $userpoints['qposts'];
-        } elseif ($value['id'] == 3) {
-            // 有口皆碑
-            $number = $userpoints['upvoteds'];
-        } elseif ($value['id'] == 4) {
-            // 乐于交流
-            $number = $userpoints['cposts'];
-        } elseif ($value['id'] == 5) {
-            // 表示赞同
-            $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
-        } elseif ($value['id'] == 6) {
-            // 优质回答
-            $number = $userpoints['aselecteds'];
-        } elseif ($value['id'] == 7) {
-            // 在线时长
-            $number = ((int)$useraccount['totalactiontime']) / 60;
-        }
-        if ($number >= $value['level_3']) {
-            return 3;
-        } elseif ($number >= $value['level_2']) {
-            return 2;
-        } elseif  ($number >= $value['level_1']) {
-            return 1;
-        }
-        return 0;
-    }
+//    function get_badge_level($value, $userpoints, $useraccount) {
+//        $number = 0;
+//        if ($value['id'] == 1) {
+//            // 知无不言
+//            $number = $userpoints['aposts'];
+//        } elseif ($value['id'] == 2) {
+//            // 好奇宝宝
+//            $number = $userpoints['qposts'];
+//        } elseif ($value['id'] == 3) {
+//            // 有口皆碑
+//            $number = $userpoints['upvoteds'];
+//        } elseif ($value['id'] == 4) {
+//            // 乐于交流
+//            $number = $userpoints['cposts'];
+//        } elseif ($value['id'] == 5) {
+//            // 表示赞同
+//            $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+//        } elseif ($value['id'] == 6) {
+//            // 优质回答
+//            $number = $userpoints['aselecteds'];
+//        } elseif ($value['id'] == 7) {
+//            // 在线时长
+//            $number = ((int)$useraccount['totalactiontime']) / 60;
+//        }
+//        if ($number >= $value['level_3']) {
+//            return 3;
+//        } elseif ($number >= $value['level_2']) {
+//            return 2;
+//        } elseif  ($number >= $value['level_1']) {
+//            return 1;
+//        }
+//        return 0;
+//    }
 }

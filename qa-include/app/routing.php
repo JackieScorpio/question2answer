@@ -37,6 +37,7 @@ function qa_controller_routing(Router $router)
 	$router->addRoute('GET', 'user/{str}/activity', "$ns\User\UserPosts", 'activity', ['template' => 'user-activity']);
 	$router->addRoute('GET', 'user/{str}/questions', "$ns\User\UserPosts", 'questions', ['template' => 'user-questions']);
 	$router->addRoute('GET', 'user/{str}/answers', "$ns\User\UserPosts", 'answers', ['template' => 'user-answers']);
+    $router->addRoute('GET', 'user/{str}/badge', "$ns\User\UserPosts", 'badge');
 
 	$router->addRoute('GET', 'users', "$ns\User\UsersList", 'top', ['template' => 'users']);
 	$router->addRoute('GET', 'users/blocked', "$ns\User\UsersList", 'blocked', ['template' => 'users']);
@@ -114,5 +115,6 @@ function qa_page_routing()
         'task' => 'pages/task.php',
         'taskman' => 'pages/task-management.php',
         'badge' => 'pages/badge.php',
+        'badgeman' => 'pages/badge-manage.php',
 	);
 }

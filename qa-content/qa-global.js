@@ -866,3 +866,58 @@ function qa_question_click_times(postid) {
 function test() {
 	console.log('test here');
 }
+
+// badge management
+function deleteBadge(obj) {
+	if (confirm("是否删除该条记录?")) {
+		const id = obj.parentNode.parentNode.childNodes[0].textContent;
+		var params = {};
+		params.id = id;
+		params.delete_badge = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('删除成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+function updateBadge(obj) {
+	const id = obj.parentNode.parentNode.childNodes[0].textContent;
+	const thistd = obj.parentNode;
+	const descriptiontd = thistd.previousSibling;
+	const level3td = descriptiontd.previousSibling;
+	const level2td = level3td.previousSibling;
+	const level1td = level2td.previousSibling;
+	const name3td = level1td.previousSibling;
+	const name2td = name3td.previousSibling;
+	const nametd = name2td.previousSibling;
+
+	descriptiontd.innerHTML = "<input id = 'badge-description' type='text' value='" + descriptiontd.innerText + "'/>";
+	level3td.innerHTML = "<input id = 'badge-level3' style='width: 40px' type='text' value='" + level3td.innerText + "'/>";
+	level2td.innerHTML = "<input id = 'badge-level2' style='width: 40px' type='text' value='" + level2td.innerText + "'/>";
+	level1td.innerHTML = "<input id = 'badge-level1' style='width: 40px' type='text' value='" + level1td.innerText + "'/>";
+	name3td.innerHTML = "<input id = 'badge-name3' style='width: 70px' type='text' value='" + name3td.innerText + "'/>";
+	name2td.innerHTML = "<input id = 'badge-name2' style='width: 70px' type='text' value='" + name2td.innerText + "'/>";
+	nametd.innerHTML = "<input id = 'badge-name' style='width: 70px' type='text' value='" + nametd.innerText + "'/>";
+	thistd.innerHTML = "<button class = \"badge-management-update-btn\">保存</button>";
+	thistd.childNodes[0].onclick = function() {
+		var params = {};
+		params.description = document.getElementById("badge-description").value;
+		params.level3 = document.getElementById("badge-level3").value;
+		params.level2 = document.getElementById("badge-level2").value;
+		params.level1 = document.getElementById("badge-level1").value;
+		params.name = document.getElementById("badge-name").value;
+		params.name2 = document.getElementById("badge-name2").value;
+		params.name3 = document.getElementById("badge-name3").value;
+		params.id = id;
+		params.update_badge = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('修改成功');
+				location.reload();
+			}
+		);
+	}
+}

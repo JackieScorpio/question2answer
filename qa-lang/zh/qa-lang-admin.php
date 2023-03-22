@@ -40,6 +40,8 @@ return array(
     'after_x_tab' => "选项卡 '^' 之后",
     'approve_user_popup' => "批准用户",
     'approve_users_title' => "用户审核",
+    'badge-manager' => "徽章管理",
+    'badge_title' => "徽章",
     'basic_editor' => "基本编辑器",
     'before_main_menu' => "在顶部的选项卡之前",
     'blobs_directory_error' => "定义为 QA_BLOBS_DIRECTORY 的目录 ^ ，在这台服务器上是不可写的。",

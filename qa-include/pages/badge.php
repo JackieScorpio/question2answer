@@ -3,7 +3,7 @@
 	Question2Answer by Gideon Greenspan and contributors
 	http://www.question2answer.org/
 
-	Description: Controller for page listing user's favorites
+	Description: Controller for page listing user's badges
 
 
 	This program is free software; you can redistribute it and/or
@@ -31,29 +31,40 @@ require_once QA_INCLUDE_DIR . 'db/points.php';
 function get_reach_count($id, $userpoints, $useraccount) {
     $number = 0;
     if ($id == 1) {
-        // 知无不言
+        // 回答数
         $number = $userpoints['aposts'];
     } elseif ($id == 2) {
-        // 好奇宝宝
+        // 提问数
         $number = $userpoints['qposts'];
     } elseif ($id == 3) {
-        // 有口皆碑
+        // 被点赞数
         $number = $userpoints['upvoteds'];
     } elseif ($id == 4) {
-        // 乐于交流
+        // 评论数
         $number = $userpoints['cposts'];
     } elseif ($id == 5) {
-        // 表示赞同
+        // 投票数
         $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
     } elseif ($id == 6) {
-        // 优质回答
+        // 被采纳数
         $number = $userpoints['aselecteds'];
     } elseif ($id == 7) {
         // 在线时长
         $number = ((int)$useraccount['totalactiontime']) / 60;
+    } elseif ($id == 8) {
+        // 首答次数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid in (1,2,3,4,5) AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)'));
+    } elseif ($id == 9) {
+        // 问题被点击数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
     }
     return $number;
 }
+
 
 // Check that we're logged in
 
@@ -79,24 +90,51 @@ if (!empty($badgeInfo)) {
     $qa_content['custom'] = '';
     foreach ($badgeInfo as $key => $value) {
         $reach_count = get_reach_count($value['id'], $userpoints, $useraccount);
-        $percentage = min(100, (int)$reach_count*100/$value['level_3']);
+        $grayscale1 = $reach_count >= $value['level_1'] ? '' : ' style="filter:grayscale(100%)" ';
+        $grayscale2 = $reach_count >= $value['level_2'] ? '' : ' style="filter:grayscale(100%)" ';
+        $grayscale3 = $reach_count >= $value['level_3'] ? '' : ' style="filter:grayscale(100%)" ';
         if ($value['id'] == 7) {
-            $qa_content['custom'] = $qa_content['custom'] . '<details>
-<summary class="qa-badge-list"><div class="g-progress" style="--progress: '.$percentage.'%">'. $value['name'] . '</div></summary>
-<ol class="qa-badge-list-item">获取条件: ' . $value['description'] . '</ol>
-<ol class="qa-badge-list-item">各级所需在线分钟数: ' . $value['level_1'] . '/' . $value['level_2'] . '/' . $value['level_3'] . '</ol>
-<ol class="qa-badge-list-item">已在线分钟数: '. (int)$reach_count .'<div class="g-progress" style="--progress: '.$percentage.'%"></div></ol>
-</details>';
+            $qa_content['custom'] .= '<div class="badge-container">
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale1 . 'alt="Badge 1" title = "所需在线分钟数:' . $value['level_1'] . '">
+			<h2>'. $value['name1'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale2 . 'alt="Badge 2" title = "所需在线分钟数:' . $value['level_2'] . '">
+			<h2>'. $value['name2'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale3 . 'alt="Badge 3" title = "所需在线分钟数:' . $value['level_3'] . '">
+			<h2>'. $value['name3'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+	</div>
+	<hr/>' ;
         } else {
-            $qa_content['custom'] = $qa_content['custom'] . '<details>
-<summary class="qa-badge-list"><div class="g-progress" style="--progress: '.$percentage.'%">'. $value['name'] . '</div></summary>
-<ol class="qa-badge-list-item">获取条件: ' . $value['description'] . '</ol>
-<ol class="qa-badge-list-item">各级所需次数: ' . $value['level_1'] . '/' . $value['level_2'] . '/' . $value['level_3'] . '</ol>
-<ol class="qa-badge-list-item">达成次数: '. $reach_count .'<div class="g-progress" style="--progress: '. $percentage .'%"></div></ol>
-</details>';
+            $qa_content['custom'] .= '<div class="badge-container">
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale1 . 'alt="Badge 1" title = "所需次数:' . $value['level_1'] . '">
+			<h2>'. $value['name1'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale2 . 'alt="Badge 2" title = "所需次数:' . $value['level_2'] . '">
+			<h2>'. $value['name2'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+		<div class="badge">
+			<img src="./qa-theme/general/qa-badge.png"' . $grayscale3 . 'alt="Badge 3" title = "所需次数:' . $value['level_3'] . '">
+			<h2>'. $value['name3'] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>
+	</div>
+	<hr/>' ;
         }
     }
 }
+
 
 // Sub navigation for account pages and suggestion
 

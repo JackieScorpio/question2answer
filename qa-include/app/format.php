@@ -719,6 +719,16 @@ function get_badge_level($value, $userpoints, $useraccount) {
     } elseif ($value['id'] == 7) {
         // 在线时长
         $number = ((int)$useraccount['totalactiontime']) / 60;
+    } elseif ($value['id'] == 8) {
+        // 首答次数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid in (1,2,3,4,5) AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)'));
+    } elseif ($value['id'] == 9) {
+        // 问题被点击数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
     }
     if ($number >= $value['level_3']) {
         return 3;
@@ -1558,7 +1568,7 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
 
         'badge' => array(
             'label' => qa_lang_html('misc/nav_user_badge'),
-            'url' => qa_path_html('badge')
+            'url' => qa_path_html('user/' . $handle . '/badge')
         )
 	);
 
