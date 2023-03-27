@@ -352,6 +352,42 @@ GROUP BY parentid)', $useraccount['userid']));
         return $number;
     }
 
+    private function get_badge_img($id) {
+        $imgname = 'qa-badge.png';
+        if ($id == 1) {
+            // 回答数
+            $imgname = 'badge-answer.png';
+        } elseif ($id == 2) {
+            // 提问数
+            $imgname = 'badge-ask.jpg';
+        } elseif ($id == 3) {
+            // 被点赞数
+            $imgname = 'badge-like.jpg';
+        } elseif ($id == 4) {
+            // 评论数
+            $imgname = 'badge-comment.png';
+        } elseif ($id == 5) {
+            // 投票数
+            $imgname = 'badge-vote.png';
+        } elseif ($id == 6) {
+            // 被采纳数
+            $imgname = 'badge-select.jpg';
+        } elseif ($id == 7) {
+            // 在线时长
+            $imgname = 'badge-onlinetime.png';
+        } elseif ($id == 8) {
+            // 首答次数
+            $imgname = 'badge-first.jpg';
+        } elseif ($id == 9) {
+            // 问题被点击数
+            $imgname = 'badge-click.png';
+        } elseif ($id == 10) {
+            // 登录天数
+            $imgname = 'badge-login.png';
+        }
+        return $imgname;
+    }
+
     public function badge($handle) {
         $this->userHtml($handle);
 
@@ -384,7 +420,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 if ($value['id'] == 7) {
                     for ($i = 1; $i <= $level; ++$i) {
                         $qa_content['custom'] .= '<div class="badge">
-			<img src="./qa-theme/general/qa-badge.png"'. 'alt="Badge" title = "达成在线分钟数:' . $value['level_'.$i] . '">
+			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成在线分钟数:' . $value['level_'.$i] . '">
 			<h2>'. $value['name'.$i] . '</h2>
 			<p>' . $value['description'] . '</p>
 		</div>';
@@ -400,7 +436,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 else {
                     for ($i = 1; $i <= $level; ++$i) {
                         $qa_content['custom'] .= '<div class="badge">
-			<img src="./qa-theme/general/qa-badge.png"'. 'alt="Badge" title = "达成次数:' . $value['level_'.$i] . '">
+			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成次数:' . $value['level_'.$i] . '">
 			<h2>'. $value['name'.$i] . '</h2>
 			<p>' . $value['description'] . '</p>
 		</div>';
@@ -448,7 +484,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 }
                 $qa_content['custom'] .= '
 		<div class="badge">
-			<img src="./qa-theme/general/qa-badge.png" alt="Badge">
+			<img src="./qa-theme/general/badge-challenge.png" alt="Badge">
 			<h2>挑战达人</h2>
 			<p>'. $desc .'</p>
 		</div>';
@@ -469,7 +505,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 }
                 $qa_content['custom'] .= '
 		<div class="badge">
-			<img src="./qa-theme/general/qa-badge.png" alt="Badge">
+			<img src="./qa-theme/general/qa-badge2.jpg" alt="Badge">
 			<h2>收藏家</h2>
 			<p>'. $desc .'</p>
 		</div>

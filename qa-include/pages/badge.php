@@ -77,10 +77,14 @@ if (!isset($userid))
     qa_redirect('login');
 
 
-$badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
-$useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT totalactiontime FROM ^users WHERE userid = #', $userid));
-$userpoints = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^userpoints WHERE userid = #', $userid));
+$badgeInfo = qa_db_read_all_assoc(qa_db_query_sub(
+    'SELECT * FROM ^badge'));
 
+$useraccount = qa_db_read_one_assoc(qa_db_query_sub(
+    'SELECT totalactiontime FROM ^users WHERE userid = #', $userid));
+
+$userpoints = qa_db_read_one_assoc(qa_db_query_sub(
+    'SELECT * FROM ^userpoints WHERE userid = #', $userid));
 
 
 // Prepare and return content for theme
@@ -93,9 +97,11 @@ if (!empty($badgeInfo)) {
     $qa_content['custom'] = '';
     foreach ($badgeInfo as $key => $value) {
         $reach_count = get_reach_count($value['id'], $userpoints, $useraccount);
+
         $grayscale1 = $reach_count >= $value['level_1'] ? '' : ' style="filter:grayscale(100%)" ';
         $grayscale2 = $reach_count >= $value['level_2'] ? '' : ' style="filter:grayscale(100%)" ';
         $grayscale3 = $reach_count >= $value['level_3'] ? '' : ' style="filter:grayscale(100%)" ';
+
         if ($value['id'] == 7) {
             $qa_content['custom'] .= '<div class="badge-container">
 		<div class="badge">
