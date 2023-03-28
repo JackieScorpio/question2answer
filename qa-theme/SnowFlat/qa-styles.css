@@ -3683,3 +3683,78 @@ table.badge-management-table tbody tr:nth-child(even) {
 	flex-wrap: wrap;
 	justify-content: center;
 }
+
+/*------[ user-statistics-management ]------*/
+table.user-statistics-management-table {
+	border-collapse: collapse;
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	font-size: 1rem;
+	font-family: Arial, sans-serif;
+	background-color: #fff;
+}
+
+table.user-statistics-management-table thead {
+	background-color: #f2f2f2;
+}
+
+table.user-statistics-management-table th, table.user-statistics-management-table td {
+	text-align: left;
+	padding: 0.5rem;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+table.user-statistics-management-table th {
+	font-weight: bold;
+}
+
+table.user-statistics-management-table tbody tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+/*------[ task-management ]------*/
+table.task-management-table {
+	border-collapse: collapse;
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	font-size: 1rem;
+	font-family: Arial, sans-serif;
+	background-color: #fff;
+}
+
+table.task-management-table thead {
+	background-color: #f2f2f2;
+}
+
+table.task-management-table th, table.task-management-table td {
+	text-align: left;
+	padding: 0.5rem;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+table.task-management-table th {
+	font-weight: bold;
+}
+
+table.task-management-table tbody tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+.task-management-search-btn {
+	background-color: green;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
+.task-management-reset-btn {
+	background-color: #4897ef;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}

@@ -53,11 +53,11 @@ function get_reach_count($id, $userpoints, $useraccount) {
         $number = ((int)$useraccount['totalactiontime']) / 60;
     } elseif ($id == 8) {
         // 首答次数
-        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid in (1,2,3,4,5) AND postid in (
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
 SELECT MIN(postid) AS first_answer_id
 FROM qa_posts
 WHERE type = \'A\'
-GROUP BY parentid)'));
+GROUP BY parentid)', $userpoints['userid']));
     } elseif ($id == 9) {
         // 问题被点击数
         $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));

@@ -902,6 +902,7 @@ function updateBadge(obj) {
 	name2td.innerHTML = "<input id = 'badge-name2' style='width: 70px' type='text' value='" + name2td.innerText + "'/>";
 	nametd.innerHTML = "<input id = 'badge-name' style='width: 70px' type='text' value='" + nametd.innerText + "'/>";
 	thistd.innerHTML = "<button class = \"badge-management-update-btn\">保存</button>";
+
 	thistd.childNodes[0].onclick = function() {
 		var params = {};
 		params.description = document.getElementById("badge-description").value;
@@ -960,4 +961,115 @@ function updateTask(obj) {
 			}
 		);
 	}
+}
+
+function searchTask() {
+	const search = document.getElementById("task-search-input").value;
+	var params = {};
+	params.search_task = true;
+	qa_ajax_post('badge_change', params,
+		function(lines) {
+			window.alert('修改成功');
+			location.reload();
+		}
+	);
+}
+
+function searchUserStat() {
+	const search = document.getElementById("user-statistics-search").value;
+	var params = {};
+	params.search_user_stat = true;
+	params.search = search;
+	operation = 'user-stat';
+	apiVersion = 0;
+	$.extend(params, {qa: 'ajax', qa_operation: operation, qa_root: qa_root, qa_request: qa_request, apiVersion: apiVersion});
+	$.post(qa_root, params, function (response) {
+			response = JSON.parse(response);
+			users = response['userStat'];
+			const userStatTable = document.getElementById('user-stat-body');
+			userStatTable.innerHTML = '';
+			for (let i = 0; i < users.length; i++) {
+				user = users[i];
+				var new_tr = document.createElement("tr");
+				// <th>用户名</th>
+				// <th>真实姓名</th>
+				// <th>回答数</th>
+				// <th>提问数</th>
+				// <th>被点赞数</th>
+				// <th>评论数</th>
+				// <th>投票数</th>
+				// <th>被采纳数</th>
+				// <th>在线时长</th>
+				// <th>首答次数</th>
+				// <th>登录天数</th>
+				new_tr.innerHTML =
+					"<td>" + user.username + "</td>" +
+					"<td>" + user.userrealname + "</td>" +
+					"<td>" + user.col1 + "</td>" +
+					"<td>" + user.col2 + "</td>" +
+					"<td>" + user.col3 + "</td>" +
+					"<td>" + user.col4 + "</td>" +
+					"<td>" + user.col5 + "</td>" +
+					"<td>" + user.col6 + "</td>" +
+					"<td>" + user.col7 + "</td>" +
+					"<td>" + user.col8 + "</td>" +
+					"<td>" + user.col10 + "</td>"
+				userStatTable.appendChild(new_tr);
+			}
+		},
+		apiVersion === 0 ? 'text' : 'json'
+	).fail(function (jqXHR) {
+
+		if (jqXHR.readyState > 0)
+			qa_ajax_error();
+	});
+}
+
+function resetUserStat() {
+	const search = document.getElementById("user-statistics-search").value;
+	var params = {};
+	params.reset_user_stat = true;
+	operation = 'user-stat';
+	apiVersion = 0;
+	$.extend(params, {qa: 'ajax', qa_operation: operation, qa_root: qa_root, qa_request: qa_request, apiVersion: apiVersion});
+	$.post(qa_root, params, function (response) {
+			response = JSON.parse(response);
+			users = response['userStat'];
+			const userStatTable = document.getElementById('user-stat-body');
+			userStatTable.innerHTML = '';
+			for (let i = 0; i < users.length; i++) {
+				user = users[i];
+				var new_tr = document.createElement("tr");
+				// <th>用户名</th>
+				// <th>真实姓名</th>
+				// <th>回答数</th>
+				// <th>提问数</th>
+				// <th>被点赞数</th>
+				// <th>评论数</th>
+				// <th>投票数</th>
+				// <th>被采纳数</th>
+				// <th>在线时长</th>
+				// <th>首答次数</th>
+				// <th>登录天数</th>
+				new_tr.innerHTML =
+					"<td>" + user.username + "</td>" +
+					"<td>" + user.userrealname + "</td>" +
+					"<td>" + user.col1 + "</td>" +
+					"<td>" + user.col2 + "</td>" +
+					"<td>" + user.col3 + "</td>" +
+					"<td>" + user.col4 + "</td>" +
+					"<td>" + user.col5 + "</td>" +
+					"<td>" + user.col6 + "</td>" +
+					"<td>" + user.col7 + "</td>" +
+					"<td>" + user.col8 + "</td>" +
+					"<td>" + user.col10 + "</td>"
+				userStatTable.appendChild(new_tr);
+			}
+		},
+		apiVersion === 0 ? 'text' : 'json'
+	).fail(function (jqXHR) {
+
+		if (jqXHR.readyState > 0)
+			qa_ajax_error();
+	});
 }

@@ -40,6 +40,7 @@ return array(
 	'approve_users_title' => 'Approve users (^)',
 	'basic_editor' => 'Basic Editor',
     'badge_title' => 'Badge',
+    'statistics_title' => 'User Statistics',
     'badge-manager' => "Badge manager",
 	'before_main_menu' => 'Before tabs at top',
 	'blobs_directory_error' => 'The directory ^ defined as QA_BLOBS_DIRECTORY is not writable by the web server.',

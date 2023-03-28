@@ -116,5 +116,6 @@ function qa_page_routing()
         'taskman' => 'pages/task-management.php',
         'badge' => 'pages/badge.php',
         'badgeman' => 'pages/badge-manage.php',
+        'statistics' => 'pages/statistics.php',
 	);
 }

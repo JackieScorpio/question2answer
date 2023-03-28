@@ -337,14 +337,17 @@ class UserPosts extends BaseController
             $number = ((int)$useraccount['totalactiontime']) / 60;
         } elseif ($id == 8) {
             // 首答次数
-            $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT count(*) from qa_posts where userid = # AND postid in (
 SELECT MIN(postid) AS first_answer_id
 FROM qa_posts
 WHERE type = \'A\'
 GROUP BY parentid)', $useraccount['userid']));
         } elseif ($id == 9) {
             // 问题被点击数
-            $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT sum(clicktimes) FROM ^posts 
+                       WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
         } elseif ($id == 10) {
             // 登录天数
             $number = (int)$useraccount['logindays'];
@@ -401,22 +404,38 @@ GROUP BY parentid)', $useraccount['userid']));
         }
 
         // Prepare content for theme
-
         $qa_content = qa_content_prepare(true);
+
         $qa_content['title'] = '徽章墙';
-        $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
+        $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub(
+            'SELECT * FROM ^badge'));
+
+        // 检测是否完成全部一级徽章
         $completed = 1;
+
         if (!empty($badgeInfo)) {
             $qa_content['custom'] = '';
             foreach ($badgeInfo as $key => $value) {
                 $reach_count = $this->get_reach_count($value['id'], $userpoints, $useraccount);
                 $level = 0;
-                if ($reach_count >= $value['level_3']) $level = 3;
-                else if ($reach_count >= $value['level_2']) $level = 2;
-                else if ($reach_count >= $value['level_1']) $level = 1;
-                if ($level == 0) $completed = 0;
+                if ($reach_count >= $value['level_3']) {
+                    $level = 3;
+                }
+                else if ($reach_count >= $value['level_2']) {
+                    $level = 2;
+                }
+                else if ($reach_count >= $value['level_1']) {
+                    $level = 1;
+                }
+
+                // 没有完成全部一级徽章
+                if ($level == 0){
+                    $completed = 0;
+                }
 
                 $qa_content['custom'] .= '<div class="badge-container">';
+
+                // 如果是在线分钟数
                 if ($value['id'] == 7) {
                     for ($i = 1; $i <= $level; ++$i) {
                         $qa_content['custom'] .= '<div class="badge">
@@ -425,6 +444,7 @@ GROUP BY parentid)', $useraccount['userid']));
 			<p>' . $value['description'] . '</p>
 		</div>';
                     }
+
                     for (; $i <= 3; ++$i) {
                         $qa_content['custom'] .= '<div class="badge">
 			<img src="./qa-theme/general/badge-lock.png"'. 'alt="Badge" title = "获取进度:' . $reach_count . '/' . $value['level_'.$i] . '">
