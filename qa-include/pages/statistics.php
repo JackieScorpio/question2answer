@@ -126,15 +126,15 @@ $qa_content['custom'] .= '
     <tr>
       <th>用户名</th>
       <th>真实姓名</th>
-      <th>回答数</th>
-      <th>提问数</th>
-      <th>被点赞数</th>
-      <th>评论数</th>
-      <th>投票数</th>
-      <th>被采纳数</th>
-      <th>在线时长</th>
-      <th>首答次数</th>
-      <th>登录天数</th>
+      <th onclick="sortStatisticsTable(2, this)" class = "user-statistics-desc">回答数</th>
+      <th onclick="sortStatisticsTable(3, this)" class = "user-statistics-desc">提问数</th>
+      <th onclick="sortStatisticsTable(4, this)" class = "user-statistics-desc">被点赞数</th>
+      <th onclick="sortStatisticsTable(5, this)" class = "user-statistics-desc">评论数</th>
+      <th onclick="sortStatisticsTable(6, this)" class = "user-statistics-desc">投票数</th>
+      <th onclick="sortStatisticsTable(7, this)" class = "user-statistics-desc">被采纳数</th>
+      <th onclick="sortStatisticsTable(8, this)" class = "user-statistics-desc">在线时长</th>
+      <th onclick="sortStatisticsTable(9, this)" class = "user-statistics-desc">首答次数</th>
+      <th onclick="sortStatisticsTable(10, this)" class = "user-statistics-desc">登录天数</th>
     </tr>
   </thead>
   <tbody id = "user-stat-body">';

@@ -1073,3 +1073,26 @@ function resetUserStat() {
 			qa_ajax_error();
 	});
 }
+
+function sortStatisticsTable(colIndex, obj) {
+	const table = document.querySelector('.user-statistics-management-table');
+	const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+	if (obj.className == "user-statistics-desc") {
+		rows.sort((a, b) => {
+			const aVal = a.children[colIndex].textContent;
+			const bVal = b.children[colIndex].textContent;
+			return bVal.localeCompare(aVal, undefined, { numeric: true });
+		});
+		obj.className = "user-statistics-asc";
+	} else {
+		rows.sort((a, b) => {
+			const aVal = a.children[colIndex].textContent;
+			const bVal = b.children[colIndex].textContent;
+			return aVal.localeCompare(bVal, undefined, { numeric: true });
+		});
+		obj.className = "user-statistics-desc"
+	}
+
+	rows.forEach(row => table.querySelector('tbody').appendChild(row));
+}

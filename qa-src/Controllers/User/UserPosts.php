@@ -438,7 +438,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 // 如果是在线分钟数
                 if ($value['id'] == 7) {
                     for ($i = 1; $i <= $level; ++$i) {
-                        $qa_content['custom'] .= '<div class="badge">
+                        $qa_content['custom'] .= '<div class="badge' . $i . '">
 			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成在线分钟数:' . $value['level_'.$i] . '">
 			<h2>'. $value['name'.$i] . '</h2>
 			<p>' . $value['description'] . '</p>
@@ -455,7 +455,7 @@ GROUP BY parentid)', $useraccount['userid']));
                 }
                 else {
                     for ($i = 1; $i <= $level; ++$i) {
-                        $qa_content['custom'] .= '<div class="badge">
+                        $qa_content['custom'] .= '<div class="badge' . $i . '">
 			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成次数:' . $value['level_'.$i] . '">
 			<h2>'. $value['name'.$i] . '</h2>
 			<p>' . $value['description'] . '</p>
@@ -481,7 +481,7 @@ GROUP BY parentid)', $useraccount['userid']));
                     $desc = '该用户已获得';
                 }
                 $qa_content['custom'] .= '<div class="badge-container">
-		<div class="badge">
+		<div class="badge4">
 			<img src="./qa-theme/general/qa-badge.png" alt="Badge">
 			<h2>赏金猎人</h2>
 			<p>'. $desc .'</p>
@@ -503,7 +503,7 @@ GROUP BY parentid)', $useraccount['userid']));
                     $desc = '该用户已获得';
                 }
                 $qa_content['custom'] .= '
-		<div class="badge">
+		<div class="badge4">
 			<img src="./qa-theme/general/badge-challenge.png" alt="Badge">
 			<h2>挑战达人</h2>
 			<p>'. $desc .'</p>
@@ -524,7 +524,7 @@ GROUP BY parentid)', $useraccount['userid']));
                     $desc = '该用户已获得';
                 }
                 $qa_content['custom'] .= '
-		<div class="badge">
+		<div class="badge4">
 			<img src="./qa-theme/general/qa-badge2.jpg" alt="Badge">
 			<h2>收藏家</h2>
 			<p>'. $desc .'</p>
