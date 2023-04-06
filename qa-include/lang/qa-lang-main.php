@@ -85,6 +85,7 @@ return array(
 	'general_error' => 'A server error occurred - please try again.',
 	'hidden' => 'hidden',
 	'highest_users' => 'Top scoring users',
+    'highest_rank' => 'Rank',
 	'hot_qs_in_x' => 'Hot questions in ^',
 	'hot_qs_title' => 'Hot questions',
 	'http_status_405' => 'Error: 405 Method Not Allowed',

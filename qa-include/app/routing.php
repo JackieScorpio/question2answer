@@ -43,6 +43,7 @@ function qa_controller_routing(Router $router)
 	$router->addRoute('GET', 'users/blocked', "$ns\User\UsersList", 'blocked', ['template' => 'users']);
 	$router->addRoute('GET', 'users/new', "$ns\User\UsersList", 'newest', ['template' => 'users']);
 	$router->addRoute('GET', 'users/special', "$ns\User\UsersList", 'special', ['template' => 'users']);
+    $router->addRoute('GET', 'users/rank', "$ns\User\UsersList", 'rank', ['template' => 'users']);
 
 	$router->addRoute('GET', 'ip/{str}', "$ns\User\Ip", 'address', ['template' => 'ip']);
 	$router->addRoute('POST', 'ip/{str}', "$ns\User\Ip", 'address', ['template' => 'ip']);

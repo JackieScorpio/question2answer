@@ -721,11 +721,11 @@ function get_badge_level($value, $userpoints, $useraccount) {
         $number = ((int)$useraccount['totalactiontime']) / 60;
     } elseif ($value['id'] == 8) {
         // 首答次数
-        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid in (1,2,3,4,5) AND postid in (
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
 SELECT MIN(postid) AS first_answer_id
 FROM qa_posts
 WHERE type = \'A\'
-GROUP BY parentid)'));
+GROUP BY parentid)', $userpoints['userid']));
     } elseif ($value['id'] == 9) {
         // 问题被点击数
         $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
@@ -1509,6 +1509,16 @@ function qa_users_sub_navigation()
 			'url' => qa_path_html('users/blocked'),
 		);
 	}
+
+    $menuItems['users$'] = array(
+        'label' => qa_lang_html('main/highest_users'),
+        'url' => qa_path_html('users'),
+    );
+
+    $menuItems['users/rank'] = array(
+        'label' => qa_lang_html('main/highest_rank'),
+        'url' => qa_path_html('users/rank'),
+    );
 
 	return $menuItems;
 }
