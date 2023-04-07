@@ -1510,15 +1510,16 @@ function qa_users_sub_navigation()
 		);
 	}
 
-    $menuItems['users$'] = array(
-        'label' => qa_lang_html('main/highest_users'),
-        'url' => qa_path_html('users'),
-    );
-
-    $menuItems['users/rank'] = array(
-        'label' => qa_lang_html('main/highest_rank'),
-        'url' => qa_path_html('users/rank'),
-    );
+    // 取消注释启动排行榜
+//    $menuItems['users$'] = array(
+//        'label' => qa_lang_html('main/highest_users'),
+//        'url' => qa_path_html('users'),
+//    );
+//
+//    $menuItems['users/rank'] = array(
+//        'label' => qa_lang_html('main/highest_rank'),
+//        'url' => qa_path_html('users/rank'),
+//    );
 
 	return $menuItems;
 }
