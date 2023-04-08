@@ -53,5 +53,85 @@
     unanswer.php page 无法打开 bug 修复
         - 此处设置为true: define('QA_ALLOW_UNINDEXED_QUERIES', true);
 
+# 增加任务系统
+
+## 建表语句
+```sql
+create table qa_task
+(
+id          int auto_increment
+primary key,
+started     datetime        not null,
+ended       datetime        not null,
+description varchar(128)    not null,
+count       int default 1   not null,
+reward      int default 500 null,
+cat         varchar(64)     null
+);
+
+create table qa_taskfinish
+(
+    id      int unsigned auto_increment
+        primary key,
+    user_id int unsigned not null,
+    task_id int          not null
+);
+```
+
+## 管理员操作 - 增加eventlog
+
+- 进入管理页面
+- 点击插件
+- 点击Event Logger的选项
+- 点选Log events to qa_eventlog database table
+- 保存
+
+## 管理员操作 - 增加任务管理页面
+
+- 进入管理界面
+- 点击页面
+- 点击添加链接
+- 链接名：任务管理 
+- 位置：在顶部选项卡之后 
+- 可见：管理员 
+- 链接URL：http://{ip}/index.php?qa=taskman
+
+# 增加徽章系统
+## 代码配置 重要！！！！
+### qa-src/Controllers/User/UserPosts.php文件
+代码第 498 行 categoryid 需改为 问答挑战类别 对应的id。
+
+## 建表语句
+```sql
+create table qa_badge
+(
+    id          int auto_increment
+        primary key,
+    name1       varchar(128)                 not null,
+    name2       varchar(128) default 'name2' not null,
+    name3       varchar(128) default 'name3' not null,
+    description varchar(128)                 null,
+    level_1     int                          null,
+    level_2     int                          null,
+    level_3     int                          null
+);
+```
+## sql语句
+```sql
+insert into qa_badge (id, name1, name2, name3, description, level_1, level_2, level_3)
+values  (1, '灵光一闪', '乐于助人', '知无不言', '回答问题', 1, 5, 20),
+        (2, '好奇宝宝', '求知达人', '探索大师', '提出问题', 1, 5, 10),
+        (3, '初遇伯乐', '备受赞誉', '有口皆碑', '获得点赞', 1, 5, 10),
+        (4, '吃瓜群众	', '见习评阅人', '资深评委', '参与评论', 1, 5, 10),
+        (5, '学会赞美', '赞不绝口', '点赞狂魔', '进行点赞', 1, 5, 10),
+        (6, '小试牛刀', '屡试不爽', '权威专家', '回答被采纳', 1, 5, 10),
+        (7, '初窥门径', '驾轻就熟', '资深用户', '在线分钟数', 5, 30, 60),
+        (8, '快人一步', '先行者', '急先锋', '首答次数', 1, 5, 10),
+        (9, '初获关注', '热度上升', '舆论焦点', '问题被点击', 1, 5, 10),
+        (10, '完美开局', '坚持不懈', '习惯养成', '登录天数', 1, 5, 10);
+```
+
+
+
 ## tips
 1. php version 7.4 is recommended, this can avoid bugs like categories can't be created(php version 8.0).

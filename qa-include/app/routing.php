@@ -37,11 +37,13 @@ function qa_controller_routing(Router $router)
 	$router->addRoute('GET', 'user/{str}/activity', "$ns\User\UserPosts", 'activity', ['template' => 'user-activity']);
 	$router->addRoute('GET', 'user/{str}/questions', "$ns\User\UserPosts", 'questions', ['template' => 'user-questions']);
 	$router->addRoute('GET', 'user/{str}/answers', "$ns\User\UserPosts", 'answers', ['template' => 'user-answers']);
+    $router->addRoute('GET', 'user/{str}/badge', "$ns\User\UserPosts", 'badge');
 
 	$router->addRoute('GET', 'users', "$ns\User\UsersList", 'top', ['template' => 'users']);
 	$router->addRoute('GET', 'users/blocked', "$ns\User\UsersList", 'blocked', ['template' => 'users']);
 	$router->addRoute('GET', 'users/new', "$ns\User\UsersList", 'newest', ['template' => 'users']);
 	$router->addRoute('GET', 'users/special', "$ns\User\UsersList", 'special', ['template' => 'users']);
+    $router->addRoute('GET', 'users/rank', "$ns\User\UsersList", 'rank', ['template' => 'users']);
 
 	$router->addRoute('GET', 'ip/{str}', "$ns\User\Ip", 'address', ['template' => 'ip']);
 	$router->addRoute('POST', 'ip/{str}', "$ns\User\Ip", 'address', ['template' => 'ip']);
@@ -111,5 +113,10 @@ function qa_page_routing()
 		'unanswered/' => 'pages/unanswered.php',
 		'unsubscribe' => 'pages/unsubscribe.php',
 		'updates' => 'pages/updates.php',
+        'task' => 'pages/task.php',
+        'taskman' => 'pages/task-management.php',
+        'badge' => 'pages/badge.php',
+        'badgeman' => 'pages/badge-manage.php',
+        'statistics' => 'pages/statistics.php',
 	);
 }

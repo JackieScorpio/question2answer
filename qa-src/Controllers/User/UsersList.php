@@ -165,6 +165,119 @@ class UsersList extends BaseController
 		return $qa_content;
 	}
 
+    public function rank() {
+        $qa_content = qa_content_prepare();
+
+        $qa_content['title'] = qa_lang_html('main/highest_rank');
+
+        $useraccount = qa_db_read_all_assoc(qa_db_query_sub(
+            'SELECT * FROM ^users'));
+
+        $userpoint = qa_db_read_all_assoc(qa_db_query_sub(
+            'SELECT * FROM ^userpoints'));
+
+        $useraccounts = array();
+        foreach ($useraccount as $user) {
+            $useraccounts[$user['userid']] = $user;
+        }
+
+        $userpoints = array();
+        foreach ($userpoint as $userp) {
+            $userpoints[$userp['userid']] = $userp;
+        }
+        $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
+
+        $usersort = array();
+        foreach ($userpoint as $userp) {
+            $userid = $userp['userid'];
+
+            $sortcol = array();
+            $sortcol['points'] = $userp['points'];
+
+            $levels = array(0,0,0,0);
+            foreach ($badgeInfo as $value) {
+                $level = $this -> get_badge_levels($value, $userp, $useraccounts[$userid]);
+                $levels[$level] += 1;
+            }
+            $levels[1] += $levels[2] + $levels[3];
+            $levels[2] += $levels[3];
+            $sortcol['badge1'] = $levels[1];
+            $sortcol['badge2'] = $levels[2];
+            $sortcol['badge3'] = $levels[3];
+            $sortcol['levels'] = $levels;
+
+            $sortcol['value'] = $userp['points'] + $levels[1] * 200 +  $levels[2] * 500 + $levels[3] * 1000;
+            $sortcol['handle'] = $useraccounts[$userid]['handle'];
+
+            $usersort[$userid] = $sortcol;
+        }
+
+        array_multisort(array_column($usersort,'value'),SORT_DESC, $usersort);
+
+
+
+        $qa_content['custom'] = '
+	<div>
+		<ul class="ques-card-list">';
+
+        $index = 1;
+        foreach ($usersort as $item) {
+            $userurl = qa_path_html('user/' . $item['handle']);
+            $itemicon = 'item-icon004';
+            if ($index == 1) {
+                $index++;
+                $itemicon = 'item-icon001';
+                $qa_content['custom'] .= '<li class="ques-card-list-noe" style="list-style-type:none;">';
+            }
+            elseif ($index == 2) {
+                $index++;
+                $itemicon = 'item-icon002';
+                $qa_content['custom'] .= '<li class="ques-card-list-two" style="list-style-type:none;">';
+            }
+            elseif ($index == 3) {
+                $index++;
+                $itemicon = 'item-icon003';
+                $qa_content['custom'] .= '<li class="ques-card-list-three" style="list-style-type:none;">';
+            } else {
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
+                $index++;
+            }
+            $badgeinamge = '';
+            for ($i = 1; $i <= 3; ++$i) {
+                $levels = $item['levels'];
+                if ($levels[$i] > 0) {
+                    $badgeinamge .= $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 20px;height: 20px"> ';
+                }
+            }
+            $qa_content['custom'] .= '<div class="ques-list-box">
+					<div class="ques-list-head">
+						<div class="ques-list-image"><img src="./qa-theme/general/rank/user.png" alt=""></div>
+					</div>
+					<div class="ques-list-name">
+						<div class="ques-list-name-head"><a href='. $userurl .'>'. $item['handle'] . '</a></div>
+						<div class="ques-list-name-text">积分: '. $item['points'] .'</div>
+					</div>
+					<div class="ques-list-badge-icon">
+					    ' .$badgeinamge .'
+					</div>
+					<span class="ques-qa-top-users-score">'. $item['value'] .'</span>
+					<span class="ques-list-name-icon '. $itemicon .'">'. ($index-1) .'</span>
+				</div>';
+
+            $qa_content['custom'] .= '</li>';
+        }
+
+
+        $qa_content['custom'] .= '    
+		</ul>
+	</div>';
+
+
+        $qa_content['navigation']['sub'] = qa_users_sub_navigation();
+
+        return $qa_content;
+    }
+
 	/**
 	 * Fetch $qa_content array for a set of ranked users.
 	 * @param  callable $fnUsersAndCount Function that returns the list of users for a page and the user total.
@@ -227,4 +340,94 @@ class UsersList extends BaseController
 
 		return $content;
 	}
+
+    private function get_reach_count($id, $userpoints, $useraccount) {
+        $number = 0;
+        if ($id == 1) {
+            // 回答数
+            $number = $userpoints['aposts'];
+        } elseif ($id == 2) {
+            // 提问数
+            $number = $userpoints['qposts'];
+        } elseif ($id == 3) {
+            // 被点赞数
+            $number = $userpoints['upvoteds'];
+        } elseif ($id == 4) {
+            // 评论数
+            $number = $userpoints['cposts'];
+        } elseif ($id == 5) {
+            // 投票数
+            $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+        } elseif ($id == 6) {
+            // 被采纳数
+            $number = $userpoints['aselecteds'];
+        } elseif ($id == 7) {
+            // 在线时长
+            $number = ((int)$useraccount['totalactiontime']) / 60;
+        } elseif ($id == 8) {
+            // 首答次数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT count(*) from qa_posts where userid = # AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)', $useraccount['userid']));
+        } elseif ($id == 9) {
+            // 问题被点击数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT sum(clicktimes) FROM ^posts 
+                       WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+        } elseif ($id == 10) {
+            // 登录天数
+            $number = (int)$useraccount['logindays'];
+        }
+        return $number;
+    }
+
+    private function get_badge_levels($value, $userpoints, $useraccount) {
+        $number = 0;
+        if ($value['id'] == 1) {
+            // 知无不言
+            $number = $userpoints['aposts'];
+        } elseif ($value['id'] == 2) {
+            // 好奇宝宝
+            $number = $userpoints['qposts'];
+        } elseif ($value['id'] == 3) {
+            // 有口皆碑
+            $number = $userpoints['upvoteds'];
+        } elseif ($value['id'] == 4) {
+            // 乐于交流
+            $number = $userpoints['cposts'];
+        } elseif ($value['id'] == 5) {
+            // 表示赞同
+            $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+        } elseif ($value['id'] == 6) {
+            // 优质回答
+            $number = $userpoints['aselecteds'];
+        } elseif ($value['id'] == 7) {
+            // 在线时长
+            $number = ((int)$useraccount['totalactiontime']) / 60;
+        } elseif ($value['id'] == 8) {
+            // 首答次数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)', $userpoints['userid']));
+        } elseif ($value['id'] == 9) {
+            // 问题被点击数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+        } elseif ($value['id']== 10) {
+            // 登录天数
+            $number = (int)$useraccount['logindays'];
+        }
+        if ($number >= $value['level_3']) {
+            return 3;
+        } elseif ($number >= $value['level_2']) {
+            return 2;
+        } elseif  ($number >= $value['level_1']) {
+            return 1;
+        }
+        return 0;
+    }
 }

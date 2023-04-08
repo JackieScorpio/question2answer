@@ -1853,5 +1853,4 @@ if (isset($checkboxtodisplay))
 
 $qa_content['navigation']['sub'] = qa_admin_sub_navigation();
 
-
 return $qa_content;

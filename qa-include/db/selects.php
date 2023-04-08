@@ -1375,7 +1375,7 @@ function qa_db_user_account_selectspec($useridhandle, $isuserid)
 			'created' => 'UNIX_TIMESTAMP(created)', 'sessioncode', 'sessionsource', 'flags', 'loggedin' => 'UNIX_TIMESTAMP(loggedin)',
 			'loginip', 'written' => 'UNIX_TIMESTAMP(written)', 'writeip',
 			'avatarblobid' => 'BINARY avatarblobid', // cast to BINARY due to MySQL bug which renders it signed in a union
-			'avatarwidth', 'avatarheight', 'points', 'wallposts',
+			'avatarwidth', 'avatarheight', 'points', 'wallposts', 'totalactiontime'
 		),
 
 		'source' => '^users LEFT JOIN ^userpoints ON ^userpoints.userid=^users.userid WHERE ^users.' . ($isuserid ? 'userid' : 'handle') . '=$',

@@ -866,3 +866,233 @@ function qa_question_click_times(postid) {
 function test() {
 	console.log('test here');
 }
+
+// badge management
+function deleteBadge(obj) {
+	if (confirm("是否删除该条记录?")) {
+		const id = obj.parentNode.parentNode.childNodes[0].textContent;
+		var params = {};
+		params.id = id;
+		params.delete_badge = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('删除成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+function updateBadge(obj) {
+	const id = obj.parentNode.parentNode.childNodes[0].textContent;
+	const thistd = obj.parentNode;
+	const descriptiontd = thistd.previousSibling;
+	const level3td = descriptiontd.previousSibling;
+	const level2td = level3td.previousSibling;
+	const level1td = level2td.previousSibling;
+	const name3td = level1td.previousSibling;
+	const name2td = name3td.previousSibling;
+	const nametd = name2td.previousSibling;
+
+	descriptiontd.innerHTML = "<input id = 'badge-description' type='text' value='" + descriptiontd.innerText + "'/>";
+	level3td.innerHTML = "<input id = 'badge-level3' style='width: 40px' type='text' value='" + level3td.innerText + "'/>";
+	level2td.innerHTML = "<input id = 'badge-level2' style='width: 40px' type='text' value='" + level2td.innerText + "'/>";
+	level1td.innerHTML = "<input id = 'badge-level1' style='width: 40px' type='text' value='" + level1td.innerText + "'/>";
+	name3td.innerHTML = "<input id = 'badge-name3' style='width: 70px' type='text' value='" + name3td.innerText + "'/>";
+	name2td.innerHTML = "<input id = 'badge-name2' style='width: 70px' type='text' value='" + name2td.innerText + "'/>";
+	nametd.innerHTML = "<input id = 'badge-name' style='width: 70px' type='text' value='" + nametd.innerText + "'/>";
+	thistd.innerHTML = "<button class = \"badge-management-update-btn\">保存</button>";
+
+	thistd.childNodes[0].onclick = function() {
+		var params = {};
+		params.description = document.getElementById("badge-description").value;
+		params.level3 = document.getElementById("badge-level3").value;
+		params.level2 = document.getElementById("badge-level2").value;
+		params.level1 = document.getElementById("badge-level1").value;
+		params.name = document.getElementById("badge-name").value;
+		params.name2 = document.getElementById("badge-name2").value;
+		params.name3 = document.getElementById("badge-name3").value;
+		params.id = id;
+		params.update_badge = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('修改成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+// task management
+function deleteTask(obj) {
+	if (confirm("是否删除该条记录?")) {
+		const id = obj.parentNode.parentNode.childNodes[0].textContent;
+		var params = {};
+		params.id = id;
+		params.delete_task = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('删除成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+function updateTask(obj) {
+	const id = obj.parentNode.parentNode.childNodes[0].textContent;
+	const thistd = obj.parentNode;
+	const rewardtd = thistd.previousSibling;
+	const counttd = rewardtd.previousSibling;
+
+	rewardtd.innerHTML = "<input id = 'task-reward' type='text' style='width: 40px' value='" + rewardtd.innerText + "'/>";
+	counttd.innerHTML = "<input id = 'task-count' type='text' style='width: 40px' value='" + counttd.innerText + "'>";
+	thistd.innerHTML = "<button class = \"badge-management-update-btn\">保存</button>";
+	thistd.childNodes[0].onclick = function() {
+		var params = {};
+		params.count = document.getElementById("task-count").value;
+		params.reward = document.getElementById("task-reward").value;
+		params.id = id;
+		params.update_task = true;
+		qa_ajax_post('badge_change', params,
+			function(lines) {
+				window.alert('修改成功');
+				location.reload();
+			}
+		);
+	}
+}
+
+function searchTask() {
+	const search = document.getElementById("task-search-input").value;
+	var params = {};
+	params.search_task = true;
+	qa_ajax_post('badge_change', params,
+		function(lines) {
+			window.alert('修改成功');
+			location.reload();
+		}
+	);
+}
+
+function searchUserStat() {
+	const search = document.getElementById("user-statistics-search").value;
+	var params = {};
+	params.search_user_stat = true;
+	params.search = search;
+	operation = 'user-stat';
+	apiVersion = 0;
+	$.extend(params, {qa: 'ajax', qa_operation: operation, qa_root: qa_root, qa_request: qa_request, apiVersion: apiVersion});
+	$.post(qa_root, params, function (response) {
+			response = JSON.parse(response);
+			users = response['userStat'];
+			const userStatTable = document.getElementById('user-stat-body');
+			userStatTable.innerHTML = '';
+			for (let i = 0; i < users.length; i++) {
+				user = users[i];
+				var new_tr = document.createElement("tr");
+				// <th>用户名</th>
+				// <th>真实姓名</th>
+				// <th>回答数</th>
+				// <th>提问数</th>
+				// <th>被点赞数</th>
+				// <th>评论数</th>
+				// <th>投票数</th>
+				// <th>被采纳数</th>
+				// <th>在线时长</th>
+				// <th>首答次数</th>
+				// <th>登录天数</th>
+				new_tr.innerHTML =
+					"<td>" + user.username + "</td>" +
+					"<td>" + user.userrealname + "</td>" +
+					"<td>" + user.col1 + "</td>" +
+					"<td>" + user.col2 + "</td>" +
+					"<td>" + user.col3 + "</td>" +
+					"<td>" + user.col4 + "</td>" +
+					"<td>" + user.col5 + "</td>" +
+					"<td>" + user.col6 + "</td>" +
+					"<td>" + user.col7 + "</td>" +
+					"<td>" + user.col8 + "</td>" +
+					"<td>" + user.col10 + "</td>"
+				userStatTable.appendChild(new_tr);
+			}
+		},
+		apiVersion === 0 ? 'text' : 'json'
+	).fail(function (jqXHR) {
+
+		if (jqXHR.readyState > 0)
+			qa_ajax_error();
+	});
+}
+
+function resetUserStat() {
+	const search = document.getElementById("user-statistics-search").value;
+	var params = {};
+	params.reset_user_stat = true;
+	operation = 'user-stat';
+	apiVersion = 0;
+	$.extend(params, {qa: 'ajax', qa_operation: operation, qa_root: qa_root, qa_request: qa_request, apiVersion: apiVersion});
+	$.post(qa_root, params, function (response) {
+			response = JSON.parse(response);
+			users = response['userStat'];
+			const userStatTable = document.getElementById('user-stat-body');
+			userStatTable.innerHTML = '';
+			for (let i = 0; i < users.length; i++) {
+				user = users[i];
+				var new_tr = document.createElement("tr");
+				// <th>用户名</th>
+				// <th>真实姓名</th>
+				// <th>回答数</th>
+				// <th>提问数</th>
+				// <th>被点赞数</th>
+				// <th>评论数</th>
+				// <th>投票数</th>
+				// <th>被采纳数</th>
+				// <th>在线时长</th>
+				// <th>首答次数</th>
+				// <th>登录天数</th>
+				new_tr.innerHTML =
+					"<td>" + user.username + "</td>" +
+					"<td>" + user.userrealname + "</td>" +
+					"<td>" + user.col1 + "</td>" +
+					"<td>" + user.col2 + "</td>" +
+					"<td>" + user.col3 + "</td>" +
+					"<td>" + user.col4 + "</td>" +
+					"<td>" + user.col5 + "</td>" +
+					"<td>" + user.col6 + "</td>" +
+					"<td>" + user.col7 + "</td>" +
+					"<td>" + user.col8 + "</td>" +
+					"<td>" + user.col10 + "</td>"
+				userStatTable.appendChild(new_tr);
+			}
+		},
+		apiVersion === 0 ? 'text' : 'json'
+	).fail(function (jqXHR) {
+
+		if (jqXHR.readyState > 0)
+			qa_ajax_error();
+	});
+}
+
+function sortStatisticsTable(colIndex, obj) {
+	const table = document.querySelector('.user-statistics-management-table');
+	const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+	if (obj.className == "user-statistics-desc") {
+		rows.sort((a, b) => {
+			const aVal = a.children[colIndex].textContent;
+			const bVal = b.children[colIndex].textContent;
+			return bVal.localeCompare(aVal, undefined, { numeric: true });
+		});
+		obj.className = "user-statistics-asc";
+	} else {
+		rows.sort((a, b) => {
+			const aVal = a.children[colIndex].textContent;
+			const bVal = b.children[colIndex].textContent;
+			return aVal.localeCompare(bVal, undefined, { numeric: true });
+		});
+		obj.className = "user-statistics-desc"
+	}
+
+	rows.forEach(row => table.querySelector('tbody').appendChild(row));
+}

@@ -310,4 +310,245 @@ class UserPosts extends BaseController
 			$this->userhtml = qa_html($handle);
 		}
 	}
+
+    // badge
+    private function get_reach_count($id, $userpoints, $useraccount) {
+        $number = 0;
+        if ($id == 1) {
+            // 回答数
+            $number = $userpoints['aposts'];
+        } elseif ($id == 2) {
+            // 提问数
+            $number = $userpoints['qposts'];
+        } elseif ($id == 3) {
+            // 被点赞数
+            $number = $userpoints['upvoteds'];
+        } elseif ($id == 4) {
+            // 评论数
+            $number = $userpoints['cposts'];
+        } elseif ($id == 5) {
+            // 投票数
+            $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+        } elseif ($id == 6) {
+            // 被采纳数
+            $number = $userpoints['aselecteds'];
+        } elseif ($id == 7) {
+            // 在线时长
+            $number = ((int)$useraccount['totalactiontime']) / 60;
+        } elseif ($id == 8) {
+            // 首答次数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT count(*) from qa_posts where userid = # AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)', $useraccount['userid']));
+        } elseif ($id == 9) {
+            // 问题被点击数
+            $number = (int)qa_db_read_one_value(qa_db_query_sub(
+                'SELECT sum(clicktimes) FROM ^posts 
+                       WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+        } elseif ($id == 10) {
+            // 登录天数
+            $number = (int)$useraccount['logindays'];
+        }
+        return $number;
+    }
+
+    private function get_badge_img($id) {
+        $imgname = 'qa-badge.png';
+        if ($id == 1) {
+            // 回答数
+            $imgname = 'badge-answer.png';
+        } elseif ($id == 2) {
+            // 提问数
+            $imgname = 'badge-ask.jpg';
+        } elseif ($id == 3) {
+            // 被点赞数
+            $imgname = 'badge-like.jpg';
+        } elseif ($id == 4) {
+            // 评论数
+            $imgname = 'badge-comment.png';
+        } elseif ($id == 5) {
+            // 投票数
+            $imgname = 'badge-vote.png';
+        } elseif ($id == 6) {
+            // 被采纳数
+            $imgname = 'badge-select.jpg';
+        } elseif ($id == 7) {
+            // 在线时长
+            $imgname = 'badge-onlinetime.png';
+        } elseif ($id == 8) {
+            // 首答次数
+            $imgname = 'badge-first.jpg';
+        } elseif ($id == 9) {
+            // 问题被点击数
+            $imgname = 'badge-click.png';
+        } elseif ($id == 10) {
+            // 登录天数
+            $imgname = 'badge-login.png';
+        }
+        return $imgname;
+    }
+
+    public function badge($handle) {
+        $this->userHtml($handle);
+
+        $loginuserid = qa_get_logged_in_userid();
+        $useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^users WHERE handle = $', $handle));
+        $userpoints = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^userpoints WHERE userid = #', $useraccount['userid']));
+
+
+        if (!QA_FINAL_EXTERNAL_USERS && !is_array($useraccount)) { // check the user exists
+            throw new PageNotFoundException();
+        }
+
+        // Prepare content for theme
+        $qa_content = qa_content_prepare(true);
+
+        $qa_content['title'] = '徽章墙';
+        $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub(
+            'SELECT * FROM ^badge'));
+
+        // 检测是否完成全部一级徽章
+        $completed = 1;
+
+        if (!empty($badgeInfo)) {
+            $qa_content['custom'] = '';
+            foreach ($badgeInfo as $key => $value) {
+                $reach_count = $this->get_reach_count($value['id'], $userpoints, $useraccount);
+                $level = 0;
+                if ($reach_count >= $value['level_3']) {
+                    $level = 3;
+                }
+                else if ($reach_count >= $value['level_2']) {
+                    $level = 2;
+                }
+                else if ($reach_count >= $value['level_1']) {
+                    $level = 1;
+                }
+
+                // 没有完成全部一级徽章
+                if ($level == 0){
+                    $completed = 0;
+                }
+
+                $qa_content['custom'] .= '<div class="badge-container">';
+
+                // 如果是在线分钟数
+                if ($value['id'] == 7) {
+                    for ($i = 1; $i <= $level; ++$i) {
+                        $qa_content['custom'] .= '<div class="badge' . $i . '">
+			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成在线分钟数:' . $value['level_'.$i] . '">
+			<h2>'. $value['name'.$i] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>';
+                    }
+
+                    for (; $i <= 3; ++$i) {
+                        $qa_content['custom'] .= '<div class="badge">
+			<img src="./qa-theme/general/badge-lock.png"'. 'alt="Badge" title = "获取进度:' . $reach_count . '/' . $value['level_'.$i] . '">
+			<h2>待解锁</h2>
+			<p>' . $value['description'] . '</p>
+		</div>';
+                    }
+                }
+                else {
+                    for ($i = 1; $i <= $level; ++$i) {
+                        $qa_content['custom'] .= '<div class="badge' . $i . '">
+			<img src="./qa-theme/general/' . $this->get_badge_img($value['id']) . '" alt="Badge" title = "达成次数:' . $value['level_'.$i] . '">
+			<h2>'. $value['name'.$i] . '</h2>
+			<p>' . $value['description'] . '</p>
+		</div>';
+                    }
+                    for (; $i <= 3; ++$i) {
+                        $qa_content['custom'] .= '<div class="badge">
+			<img src="./qa-theme/general/badge-lock.png"' . 'alt="Badge" title = "获取进度:' . $reach_count . '/' . $value['level_' . $i] . '">
+			<h2>待解锁</h2>
+			<p>' . $value['description'] . '</p>
+		</div>';
+                    }
+                }
+                $qa_content['custom'] .= '</div><hr/>';
+
+            }
+            // 隐藏成就
+            // 完成五次任务
+            $taskcount = qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE user_id = #', $useraccount['userid']));
+            if ($taskcount >= 5) {
+                $desc = '完成五次任务';
+                if ($loginuserid != $useraccount['userid']) {
+                    $desc = '该用户已获得';
+                }
+                $qa_content['custom'] .= '<div class="badge-container">
+		<div class="badge4">
+			<img src="./qa-theme/general/qa-badge.png" alt="Badge">
+			<h2>赏金猎人</h2>
+			<p>'. $desc .'</p>
+		</div>';
+            } else {
+                $qa_content['custom'] .= '<div class="badge-container">
+		<div class="badge">
+			<img src="./qa-theme/general/badge-lock2.png" alt="Badge">
+			<h2>待解锁</h2>
+			<p>隐藏成就</p>
+		</div>';
+            }
+            // 参与十次问答挑战
+            // TODO categoryid 需改为 问答挑战 的id。
+            $challengecount = qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^posts WHERE userid = # AND categoryid = 1 AND type = \'A\'', $useraccount['userid']));
+            if ($challengecount >= 10) {
+                $desc = '参与十次问答挑战';
+                if ($loginuserid != $useraccount['userid']) {
+                    $desc = '该用户已获得';
+                }
+                $qa_content['custom'] .= '
+		<div class="badge4">
+			<img src="./qa-theme/general/badge-challenge.png" alt="Badge">
+			<h2>挑战达人</h2>
+			<p>'. $desc .'</p>
+		</div>';
+            } else {
+                $qa_content['custom'] .= '
+		<div class="badge">
+			<img src="./qa-theme/general/badge-lock2.png" alt="Badge">
+			<h2>待解锁</h2>
+			<p>隐藏成就</p>
+		</div>';
+            }
+
+            // 完成所有一级徽章
+            if ($completed == 1) {
+                $desc = '获得第一列徽章';
+                if ($loginuserid != $useraccount['userid']) {
+                    $desc = '该用户已获得';
+                }
+                $qa_content['custom'] .= '
+		<div class="badge4">
+			<img src="./qa-theme/general/qa-badge2.jpg" alt="Badge">
+			<h2>收藏家</h2>
+			<p>'. $desc .'</p>
+		</div>
+	</div>
+	<hr/>' ;
+            } else {
+                $qa_content['custom'] .= '
+		<div class="badge">
+			<img src="./qa-theme/general/badge-lock2.png" alt="Badge">
+			<h2>待解锁</h2>
+			<p>隐藏成就</p>
+		</div>
+	</div>
+	<hr/>' ;
+            }
+        }
+
+        // Sub menu for navigation in user pages
+
+        $ismyuser = isset($loginuserid) && $loginuserid == (QA_FINAL_EXTERNAL_USERS ? $this->userid : $useraccount['userid']);
+        $qa_content['navigation']['sub'] = qa_user_sub_navigation($handle, 'badge', $ismyuser);
+
+
+        return $qa_content;
+    }
 }

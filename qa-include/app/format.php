@@ -598,9 +598,26 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
 			if (@$options['pointsview'])
 				$fields['who']['points'] = ($post['points'] == 1) ? qa_lang_html_sub_split('main/1_point', '1', '1')
 					: qa_lang_html_sub_split('main/x_points', qa_format_number($post['points'], 0, true));
-
-			if (isset($options['pointstitle']))
-				$fields['who']['title'] = qa_get_points_title_html($post['points'], $options['pointstitle']);
+            $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
+            $useraccount = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^users WHERE userid = #', @$post['userid']));
+            $userpoints = qa_db_read_one_assoc(qa_db_query_sub('SELECT * FROM ^userpoints WHERE userid = #', @$post['userid']));
+            if (!empty($userpoints) && !empty($badgeInfo)) {
+                $levels = array(0,0,0,0);
+                foreach ($badgeInfo as $value) {
+                    $level = get_badge_level($value, $userpoints, $useraccount);
+                    $levels[$level] += 1;
+                }
+                $fields['who']['title'] = '';
+                $levels[1] += $levels[2] + $levels[3];
+                $levels[2] += $levels[3];
+                for ($i = 1; $i <= 3; ++$i) {
+                    if ($levels[$i] > 0) {
+                        $fields['who']['title'] = $fields['who']['title'] . $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 15px;height: 15px"> ';
+                    }
+                }
+            }
+//			if (isset($options['pointstitle']))
+//				$fields['who']['title'] = qa_get_points_title_html($post['points'], $options['pointstitle']);
 		}
 
 		if (isset($post['level']))
@@ -677,6 +694,53 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
 	// That's it!
 
 	return $fields;
+}
+
+function get_badge_level($value, $userpoints, $useraccount) {
+    $number = 0;
+    if ($value['id'] == 1) {
+        // 知无不言
+        $number = $userpoints['aposts'];
+    } elseif ($value['id'] == 2) {
+        // 好奇宝宝
+        $number = $userpoints['qposts'];
+    } elseif ($value['id'] == 3) {
+        // 有口皆碑
+        $number = $userpoints['upvoteds'];
+    } elseif ($value['id'] == 4) {
+        // 乐于交流
+        $number = $userpoints['cposts'];
+    } elseif ($value['id'] == 5) {
+        // 表示赞同
+        $number = $userpoints['qupvotes'] + $userpoints['aupvotes'];
+    } elseif ($value['id'] == 6) {
+        // 优质回答
+        $number = $userpoints['aselecteds'];
+    } elseif ($value['id'] == 7) {
+        // 在线时长
+        $number = ((int)$useraccount['totalactiontime']) / 60;
+    } elseif ($value['id'] == 8) {
+        // 首答次数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
+SELECT MIN(postid) AS first_answer_id
+FROM qa_posts
+WHERE type = \'A\'
+GROUP BY parentid)', $userpoints['userid']));
+    } elseif ($value['id'] == 9) {
+        // 问题被点击数
+        $number = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userpoints['userid']));
+    } elseif ($value['id']== 10) {
+        // 登录天数
+        $number = (int)$useraccount['logindays'];
+    }
+    if ($number >= $value['level_3']) {
+        return 3;
+    } elseif ($number >= $value['level_2']) {
+        return 2;
+    } elseif  ($number >= $value['level_1']) {
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -1446,6 +1510,17 @@ function qa_users_sub_navigation()
 		);
 	}
 
+    // 取消注释启动排行榜
+//    $menuItems['users$'] = array(
+//        'label' => qa_lang_html('main/highest_users'),
+//        'url' => qa_path_html('users'),
+//    );
+//
+//    $menuItems['users/rank'] = array(
+//        'label' => qa_lang_html('main/highest_rank'),
+//        'url' => qa_path_html('users/rank'),
+//    );
+
 	return $menuItems;
 }
 
@@ -1499,6 +1574,16 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
 			'label' => qa_lang_html('misc/nav_user_as'),
 			'url' => qa_path_html('user/' . $handle . '/answers'),
 		),
+
+        'task' => array(
+            'label' => qa_lang_html('misc/nav_user_task'),
+            'url' => qa_path_html('task')
+        ),
+
+        'badge' => array(
+            'label' => qa_lang_html('misc/nav_user_badge'),
+            'url' => qa_path_html('user/' . $handle . '/badge')
+        )
 	);
 
 	if (isset($navigation[$selected]))
@@ -1510,8 +1595,10 @@ function qa_user_sub_navigation($handle, $selected, $ismyuser = false)
 	if (QA_FINAL_EXTERNAL_USERS || !$ismyuser)
 		unset($navigation['account']);
 
-	if (!$ismyuser)
-		unset($navigation['favorites']);
+	if (!$ismyuser) {
+        unset($navigation['favorites']);
+        unset($navigation['task']);
+    }
 
 	if (QA_FINAL_EXTERNAL_USERS || !$ismyuser || !qa_opt('allow_private_messages') || !qa_opt('show_message_history'))
 		unset($navigation['messages']);
