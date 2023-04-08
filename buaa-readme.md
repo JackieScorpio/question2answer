@@ -57,7 +57,7 @@
 
 ## 建表语句
 ```sql
-create table q2a.qa_task
+create table qa_task
 (
 id          int auto_increment
 primary key,
@@ -69,7 +69,7 @@ reward      int default 500 null,
 cat         varchar(64)     null
 );
 
-create table q2a.qa_taskfinish
+create table qa_taskfinish
 (
     id      int unsigned auto_increment
         primary key,
@@ -99,7 +99,7 @@ create table q2a.qa_taskfinish
 # 增加徽章系统
 ## 代码配置 重要！！！！
 ### qa-src/Controllers/User/UserPosts.php文件
-代码第 444 行 categoryid 需改为 问答挑战类别 对应的id。
+代码第 498 行 categoryid 需改为 问答挑战类别 对应的id。
 
 ## 建表语句
 ```sql

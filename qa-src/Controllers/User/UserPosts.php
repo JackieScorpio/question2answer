@@ -495,7 +495,7 @@ GROUP BY parentid)', $useraccount['userid']));
 		</div>';
             }
             // 参与十次问答挑战
-            // categoryid 需改为 问答挑战 的id。
+            // TODO categoryid 需改为 问答挑战 的id。
             $challengecount = qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^posts WHERE userid = # AND categoryid = 1 AND type = \'A\'', $useraccount['userid']));
             if ($challengecount >= 10) {
                 $desc = '参与十次问答挑战';
