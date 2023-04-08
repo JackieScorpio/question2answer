@@ -360,7 +360,7 @@ class qa_html_theme extends qa_html_theme_base
                 // add closed note in title
                 $imgHtml,
                 '<a href="' . $q_item['url'] . '" onclick="qa_question_click_times(' . $postid . ')">' . $q_item['title'] . '</a>',
-                '<img src="' . $this->rooturl . '../general' . '/q-challenge.png" class="qam-q-list-close-icon" alt="' . $challengeText . '" title="' . $challengeText . '"/>',
+                '<img src="' . $this->rooturl . '../general' . '/q-challenge.png" class="qam-q-list-close-icon qam-q-list-close-icon-adjust-style" alt="' . $challengeText . '" title="' . $challengeText . '"/>',
                 '</div>'
             );
         } else {
