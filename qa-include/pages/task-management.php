@@ -160,7 +160,7 @@ foreach ($tasks as $task) {
     $qa_content['custom'] .= '<td>' . $task['id'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['started'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['ended'] . '</td>';
-    $qa_content['custom'] .= '<td>' . $task['description'] . '</td>';
+    $qa_content['custom'] .= '<td>' . str_replace('?', $task['count'], $task['description']) . '</td>';
     $qa_content['custom'] .= '<td>' . $task['count'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['reward'] . '</td>';
     $qa_content['custom'] .= '<td><button class = "badge-management-delete-btn" onclick="deleteTask(this)">删除</button><button class = "badge-management-update-btn" onclick="updateTask(this)">修改</button></td>';
@@ -195,7 +195,7 @@ foreach ($tasks as $task) {
     $qa_content['custom'] .= '<td>' . $task['id'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['started'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['ended'] . '</td>';
-    $qa_content['custom'] .= '<td>' . $task['description'] . '</td>';
+    $qa_content['custom'] .= '<td>' . str_replace('?', $task['count'], $task['description']) . '</td>';
     $qa_content['custom'] .= '<td>' . $task['count'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['reward'] . '</td>';
     $qa_content['custom'] .= '</tr>';
