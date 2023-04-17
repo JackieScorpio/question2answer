@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Majestic Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="../../vendors/base/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="../../images/favicon.png" />
+</head>
+
+<body>
+<div class="container-scroller">
+    <!-- partial:../../partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex justify-content-center">
+            <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand brand-logo" href="../../index.html">数据统计</a>
+                <a class="navbar-brand brand-logo-mini" href="../../index.html"><img src="../../images/beihangbadge.jpg" alt="logo"/></a>
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="mdi mdi-sort-variant"></span>
+                </button>
+            </div>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+            <ul class="navbar-nav mr-lg-4 w-100">
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                <span class="mdi mdi-menu"></span>
+            </button>
+        </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="../../index.html">
+                        <i class="mdi mdi-home menu-icon"></i>
+                        <span class="menu-title">总览</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../pages/charts/chartjs.html">
+                        <i class="mdi mdi-chart-pie menu-icon"></i>
+                        <span class="menu-title">基本数据</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../pages/charts/chartjs2.html">
+                        <i class="mdi mdi-chart-bar menu-icon"></i>
+                        <span class="menu-title">游戏化数据</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../pages/tables/basic-table.html">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">表格</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../../../index.php">
+                        <i class="mdi mdi-clipboard-flow menu-icon"></i>
+                        <span class="menu-title">问答网站</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">任务完成人数</h4>
+                                <canvas id="taskFinishUserCountChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">用户任务完成数</h4>
+                                <canvas id="taskFinishCountChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">用户徽章数</h4>
+                                <canvas id="badgeCountChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!--            <div class="col-lg-6 grid-margin stretch-card">-->
+                    <!--              <div class="card">-->
+                    <!--                <div class="card-body">-->
+                    <!--                  <h4 class="card-title">Area chart</h4>-->
+                    <!--                  <canvas id="areaChart"></canvas>-->
+                    <!--                </div>-->
+                    <!--              </div>-->
+                    <!--            </div>-->
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">问答挑战</h4>
+                                <canvas id="challengePieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--          <div class="row">-->
+                <!--            <div class="col-lg-6 grid-margin stretch-card">-->
+                <!--              <div class="card">-->
+                <!--                <div class="card-body">-->
+                <!--                  <h4 class="card-title">Pie chart</h4>-->
+                <!--                  <canvas id="pieChart"></canvas>-->
+                <!--                </div>-->
+                <!--              </div>-->
+                <!--            </div>-->
+                <!--            <div class="col-lg-6 grid-margin stretch-card">-->
+                <!--              <div class="card">-->
+                <!--                <div class="card-body">-->
+                <!--                  <h4 class="card-title">Scatter chart</h4>-->
+                <!--                  <canvas id="scatterChart"></canvas>-->
+                <!--                </div>-->
+                <!--              </div>-->
+                <!--            </div>-->
+                <!--          </div>-->
+                <div class="row">
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">一级徽章</h4>
+                                <canvas id="pieBadge1"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">二级徽章</h4>
+                                <canvas id="pieBadge2"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">三级徽章</h4>
+                                <canvas id="pieBadge3"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">各类别占比</h4>
+                                <canvas id="pieBadge4"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- content-wrapper ends -->
+            <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>
+<!-- container-scroller -->
+<!-- plugins:js -->
+<script src="../../vendors/base/vendor.bundle.base.js"></script>
+<!-- endinject -->
+<!-- Plugin js for this page-->
+<script src="../../vendors/chart.js/Chart.min.js"></script>
+<!-- End plugin js for this page-->
+<!-- inject:js -->
+<script src="../../js/off-canvas.js"></script>
+<script src="../../js/hoverable-collapse.js"></script>
+<script src="../../js/template.js"></script>
+<!-- endinject -->
+<!-- Custom js for this page-->
+<script src="../../js/chart.js"></script>
+<script src="../../js/chart2.js"></script>
+<!-- End custom js for this page-->
+</body>
+
+</html>

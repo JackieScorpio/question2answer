@@ -118,14 +118,19 @@ $qa_content['custom'] = '<div style="overflow-x: scroll">';
 
 $qa_content['custom'] .= '<input id = "user-statistics-search" placeholder="请输入要查找的用户名或姓名" style="width: 200px">
 <button class="task-management-search-btn" onclick="searchUserStat()">搜索</button>
-<button class="task-management-reset-btn" onclick="resetUserStat()">重置</button>';
+<button class="task-management-reset-btn" onclick="resetUserStat()">重置</button>
+<a href="./qa-statistics/pages/samples/login.html"><button class="task-management-visualization-btn"">可视化界面</button></a>';
 
 $qa_content['custom'] .= '
   <table class="user-statistics-management-table">
   <thead>
     <tr>
-      <th>用户名</th>
-      <th>真实姓名</th>
+      <th>
+        用户名
+      </th>
+      <th>
+        真实姓名
+      </th>
       <th onclick="sortStatisticsTable(2, this)" class = "user-statistics-desc">回答数</th>
       <th onclick="sortStatisticsTable(3, this)" class = "user-statistics-desc">提问数</th>
       <th onclick="sortStatisticsTable(4, this)" class = "user-statistics-desc">被点赞数</th>
