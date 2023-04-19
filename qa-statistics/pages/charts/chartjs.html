@@ -78,6 +78,21 @@
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
+            <div class="col-lg-6 stretch-card">
+              <div class="input-group-prepend">
+                <span class="input-group-text bg-primary text-white">开始</span>
+              </div>
+              <input class="form-control" type="date" name="start_date" id="chart-start-date">
+              <div class="input-group-prepend">
+                <span class="input-group-text bg-primary text-white">截止</span>
+              </div>
+              <input class="form-control" type="date" name="end_date" id="chart-end-date">
+              <div class="input-group-append">
+                <button class="btn btn-sm btn-primary" type="button" onclick="updateDate()">更新</button>
+              </div>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-lg-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
