@@ -137,6 +137,8 @@ values  (1, '灵光一闪', '乐于助人', '知无不言', '回答问题', 1, 5
 ### qa-statistics/ajax/table.php
 第 121行 catidpath1 = 1 改为 catidpath1 = ？（问号未对应问答挑战的id，应该为6）。
 
+可视化界面账号：buaaadmin 
+密码：buaaadmin
 
 ## tips
 1. php version 7.4 is recommended, this can avoid bugs like categories can't be created(php version 8.0).
