@@ -4109,7 +4109,6 @@ table.task-management-table tbody tr:nth-child(even) {
 	bottom: 0;
 	left: 10px;
 	display: block;
-	width: 280px;
 	height: 1px;
 	content: '';
 	background-color: #ededed;
