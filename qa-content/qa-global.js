@@ -933,7 +933,7 @@ function deleteTask(obj) {
 		qa_ajax_post('badge_change', params,
 			function(lines) {
 				window.alert('删除成功');
-				location.reload();
+				location.href = './index.php?qa=taskman';
 			}
 		);
 	}

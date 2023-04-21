@@ -100,7 +100,7 @@ $qa_content['custom'] = '<div style="overflow-x: scroll">';
 $qa_content['custom'] .= '<input id = "user-statistics-search" placeholder="请输入要查找的用户名或姓名" style="width: 200px">
 <button class="task-management-search-btn" onclick="searchUserStat()">搜索</button>
 <button class="task-management-reset-btn" onclick="resetUserStat()">重置</button>
-<a href="./qa-statistics/pages/samples/login.html"><button class="task-management-visualization-btn"">可视化界面</button></a>';
+<a href="./qa-statistics/index.html"><button class="task-management-visualization-btn"">可视化界面</button></a>';
 
 $qa_content['custom'] .= '
   <table class="user-statistics-management-table">
