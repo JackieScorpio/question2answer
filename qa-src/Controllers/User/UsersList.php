@@ -242,11 +242,12 @@ class UsersList extends BaseController
         }
         $totalnum = 9;
 
-        $weight_matrix[] = array(0.0285, 0.0168, 0.0799, 0.0799, 0.0799, 0.21, 0.1838, 0.1373, 0.1838);
+        $weight_matrix = array(0.0285, 0.0168, 0.0799, 0.0799, 0.0799, 0.21, 0.1838, 0.1373, 0.1838);
 
 //        for ($i = 0; $i<$totalnum; ++$i) {
 //            $weight_matrix[$i] = 1/$totalnum;
 //        }
+
 
         $impact_matrix[] = array();
         for ($i = 0; $i<$totalnum; ++$i) {

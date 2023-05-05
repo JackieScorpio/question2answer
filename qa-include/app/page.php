@@ -574,7 +574,7 @@ function qa_content_prepare($voting = false, $categoryids = array())
 
 	if (qa_opt('nav_users')) {
 		$qa_content['navigation']['main']['user'] = array(
-			'url' => qa_path_html('users'),
+			'url' => qa_path_html('users/rank'),
 			'label' => qa_lang_html('main/nav_users'),
 			'selected_on' => array('users$', 'users/', 'user/'),
 		);

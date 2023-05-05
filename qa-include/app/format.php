@@ -1482,6 +1482,11 @@ function qa_users_sub_navigation()
 	$showNewUsersPage = !qa_user_permit_error('permit_view_new_users_page');
 	$showSpecialUsersPage = !qa_user_permit_error('permit_view_special_users_page');
 
+    $menuItems['users/rank'] = array(
+        'label' => qa_lang_html('main/highest_rank'),
+        'url' => qa_path_html('users/rank'),
+    );
+
 	if ($moderatorPlus || $showNewUsersPage || $showSpecialUsersPage) {
 		// We want to show this item when more than one item should be displayed
 		$menuItems['users$'] = array(
@@ -1517,10 +1522,7 @@ function qa_users_sub_navigation()
         'url' => qa_path_html('users'),
     );
 
-    $menuItems['users/rank'] = array(
-        'label' => qa_lang_html('main/highest_rank'),
-        'url' => qa_path_html('users/rank'),
-    );
+
 
 	return $menuItems;
 }
