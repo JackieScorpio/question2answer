@@ -206,7 +206,7 @@ class UsersList extends BaseController
             $sortcol['badge3'] = $levels[3];
             $sortcol['levels'] = $levels;
 
-            $sortcol['value'] = $userp['points'] + $levels[1] * 200 +  $levels[2] * 500 + $levels[3] * 1000;
+            //$sortcol['value'] = $userp['points'] + $levels[1] * 200 +  $levels[2] * 500 + $levels[3] * 1000;
             $sortcol['handle'] = $useraccounts[$userid]['handle'];
 
             $usersort[$userid] = $sortcol;
@@ -233,12 +233,24 @@ class UsersList extends BaseController
             $topsis_user[] = $usersort[$userid]['badge1'] * 1 + $usersort[$userid]['badge2'] * 5 + $usersort[$userid]['badge1'] * 10;
 
             // 任务系统 完成任务数
-            $topsis_user[] = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE user_id = #', $userid));
+            $taskFinish = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE user_id = #', $userid));
+            $topsis_user[] = $taskFinish;
 
             // 积分
             $topsis_user[] = (int)$userp['points'];
 
             $input_matrix[] = $topsis_user;
+
+            // 记录各个信息以显示
+            $usersort[$userid]['totalactiontime'] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
+            $usersort[$userid]['logindays'] = (int)$useraccounts[$userid]['logindays'];
+            $usersort[$userid]['aposts'] = (int)$userp['aposts'];
+            $usersort[$userid]['qposts'] = (int)$userp['qposts'];
+            $usersort[$userid]['upvoteds'] = (int)$userp['upvoteds'];
+            $usersort[$userid]['aselecteds'] = (int)$userp['aselecteds'];
+            $usersort[$userid]['taskfinish'] = $taskFinish;
+
+
         }
         $totalnum = 9;
 
@@ -281,32 +293,50 @@ class UsersList extends BaseController
             if ($index == 1) {
                 $index++;
                 $itemicon = 'item-icon001';
-                $qa_content['custom'] .= '<li class="ques-card-list-noe" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             }
             elseif ($index == 2) {
                 $index++;
                 $itemicon = 'item-icon002';
-                $qa_content['custom'] .= '<li class="ques-card-list-two" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             }
             elseif ($index == 3) {
                 $index++;
                 $itemicon = 'item-icon003';
-                $qa_content['custom'] .= '<li class="ques-card-list-three" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             } else {
                 $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
                 $index++;
             }
+
             $badgeinamge = '';
+            $badgeinamge .= $item['qposts'] . '<img src = "./qa-theme/general/rank-question.png" style="width: 20px;height: 20px" title="提问数"> ';
+            $badgeinamge .= $item['aposts'] . '<img src = "./qa-theme/general/rank-answer.png" style="width: 20px;height: 20px" title="回答数"> ';
+            $badgeinamge .= $item['taskfinish'] . '<img src = "./qa-theme/general/rank-task.png" style="width: 20px;height: 20px" title="任务完成数"> ';
+
             for ($i = 1; $i <= 3; ++$i) {
                 $levels = $item['levels'];
                 if ($levels[$i] > 0) {
                     $badgeinamge .= $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 20px;height: 20px"> ';
                 }
             }
+
+//            $qa_content['custom'] .= '<div class="ques-list-box">
+//					<div class="ques-list-head">
+//						<div class="ques-list-image"><img src="./qa-theme/general/rank/user.png" alt=""></div>
+//					</div>
+//					<div class="ques-list-name">
+//						<div class="ques-list-name-head"><a href='. $userurl .'>'. $item['handle'] . '</a></div>
+//						<div class="ques-list-name-text">积分: '. $item['points'] .'</div>
+//					</div>
+//					<div class="ques-list-badge-icon">
+//					    ' .$badgeinamge .'
+//					</div>
+//					<span class="ques-qa-top-users-score">'. (int)($item['value']*1000) .'</span>
+//					<span class="ques-list-name-icon '. $itemicon .'">'. ($index-1) .'</span>
+//				</div>';
             $qa_content['custom'] .= '<div class="ques-list-box">
-					<div class="ques-list-head">
-						<div class="ques-list-image"><img src="./qa-theme/general/rank/user.png" alt=""></div>
-					</div>
+					
 					<div class="ques-list-name">
 						<div class="ques-list-name-head"><a href='. $userurl .'>'. $item['handle'] . '</a></div>
 						<div class="ques-list-name-text">积分: '. $item['points'] .'</div>
