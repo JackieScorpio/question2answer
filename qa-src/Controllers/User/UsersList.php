@@ -310,9 +310,18 @@ class UsersList extends BaseController
             }
 
             $badgeinamge = '';
-            $badgeinamge .= $item['qposts'] . '<img src = "./qa-theme/general/rank-question.png" style="width: 20px;height: 20px" title="提问数"> ';
-            $badgeinamge .= $item['aposts'] . '<img src = "./qa-theme/general/rank-answer.png" style="width: 20px;height: 20px" title="回答数"> ';
-            $badgeinamge .= $item['taskfinish'] . '<img src = "./qa-theme/general/rank-task.png" style="width: 20px;height: 20px" title="任务完成数"> ';
+            if ($item['qposts'] != 0)
+            $badgeinamge .= $item['qposts'] . '<img src = "./qa-theme/general/rank-question.png" style="width: 20px;height: 20px" title="提问数"> &ensp;';
+
+            if ($item['aposts'] != 0)
+            $badgeinamge .= $item['aposts'] . '<img src = "./qa-theme/general/rank-answer.png" style="width: 20px;height: 20px" title="回答数"> &ensp;';
+
+            if ($item['aselecteds'] != 0)
+                $badgeinamge .= $item['aselecteds'] . '<img src = "./qa-theme/general/rank-selected.png" style="width: 20px;height: 20px" title="回答采纳数"> &ensp;';
+
+            if ($item['taskfinish'] != 0)
+            $badgeinamge .= $item['taskfinish'] . '<img src = "./qa-theme/general/rank-task.png" style="width: 20px;height: 20px" title="任务完成数"> &ensp;';
+
 
             for ($i = 1; $i <= 3; ++$i) {
                 $levels = $item['levels'];
