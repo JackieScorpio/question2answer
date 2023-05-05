@@ -105,7 +105,7 @@ $task_types = array(
     'a_post' => '回答问题',
     'c_post' => '进行评论',
     'vote' => '参与投票',
-    'a_select' => '采纳答案',
+    //'a_select' => '采纳答案',
 
 );
 $qa_content['form']['fields']['task_type'] = array(
@@ -178,7 +178,7 @@ $tasks = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^task'));
 $qa_content['custom'] .= '<hr>';
 
 $qa_content['custom'] .= '<div style="overflow-x: scroll">
-  <h2>所有任务</h2>
+  <h2>所有任务<a href="./qa-statistics/pages/tables/basic-table.html"><button class="task-management-visualization-btn"">完成情况</button></a></h2>
   <table class="task-management-table">
   <thead>
     <tr>

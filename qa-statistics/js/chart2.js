@@ -296,9 +296,9 @@ $(function() {
                     label: '任务完成人数',
                     data: response.task.taskFinishCount,
                     backgroundColor:
-                        new Array(parseInt(response.users.idlength)).fill('rgba(224,151,118,0.2)'),
+                        new Array(parseInt(response.task.taskCount)).fill('rgba(224,151,118,0.2)'),
                     borderColor:
-                        new Array(parseInt(response.users.idlength)).fill('rgb(77,39,24)'),
+                        new Array(parseInt(response.task.taskCount)).fill('rgb(77,39,24)'),
                     borderWidth: 1,
                     fill: false
                 }]

@@ -100,6 +100,33 @@ $data['chart2']['total'] = $total;
 $data['chart2']['maxcount'] = $topvalue;
 $data['chart2']['topvaluetext'] = $topvalue . ' (提问:' . $qcount[$topindex] . ' 回答:' . $acount[$topindex] . ' 评论:' . $ccount[$topindex] . ')';
 
+// login number
+$logincount = array();
+$weeklogindate = array();
+$maxlogincount = 0;
+
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('m-d', strtotime("-$i day"));
+
+    $next = $i - 1;
+    $date1 = date('y-m-d', strtotime("-$i day"));
+    $date2 = date('y-m-d', strtotime("-$next day"));
+    $date1 .= ' 00:00:00"';
+    $date2 .= ' 00:00:00"';
+    $date1 = '"20'.$date1;
+    $date2 = '"20'.$date2;
+
+    $result = $conn->query('SELECT count(*) FROM qa_eventlog
+                WHERE event = \'u_login\' AND datetime >= '.$date1.'
+                  AND datetime < '.$date2)->fetch_row();
+    $logincount[] = $result[0];
+    $maxlogincount = max($maxcount, $result[0]);
+    $weeklogindate[] = $date;
+}
+$data['chartlogin']['logincount'] = $logincount;
+$data['chartlogin']['weekdate'] = $weeklogindate;
+$data['chartlogin']['maxcount'] = $maxlogincount;
+
 // table
 $result = $conn->query("SELECT qa_users.handle, qa_users.realname, 
        qa_users.email, qa_userpoints.points, qa_userpoints.qposts, 

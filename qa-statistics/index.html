@@ -25,7 +25,7 @@
       <div class="navbar-brand-wrapper d-flex justify-content-center">
         <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">  
           <a class="navbar-brand brand-logo" href="index.html">数据统计</a>
-          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="images/beihangbadge.jpg" alt="logo"/></a>
+          <a class="navbar-brand brand-logo-mini" href="index.html"><img src="images/list-icon.png" alt="logo"/></a>
           <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
             <span class="mdi mdi-sort-variant"></span>
           </button>
@@ -70,7 +70,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="../index.php?qa=statistics">
+            <a class="nav-link" href="../index.php">
               <i class="mdi mdi-clipboard-flow menu-icon"></i>
               <span class="menu-title">问答网站</span>
             </a>
@@ -150,7 +150,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-7 grid-margin stretch-card">
+            <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <p class="card-title">问答数据</p>
@@ -160,16 +160,22 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-5 grid-margin stretch-card">
+            <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title">流量趋势</p>
-                  <h2>峰值</h2>
-                  <h4 id = "qac-top-value">0 (q:0 a:0 c:0)</h4>
-                  <p class="text-muted">该图表显示了过去36小时内的流量趋势 </p>
-                  <div id="total-sales-chart-legend"></div>                  
+                  <p class="card-title">网站数据</p>
+                  <p class="mb-4">最近一周内，网站的登录人数</p>
+                  <p class="mb-4" style="color: whitesmoke">0</p>
+                  <canvas id="cash-deposits-chart1"></canvas>
                 </div>
-                <canvas id="total-sales-chart"></canvas>
+<!--                <div class="card-body">-->
+<!--                  <p class="card-title">流量趋势</p>-->
+<!--                  <h2>峰值</h2>-->
+<!--                  <h4 id = "qac-top-value">0 (q:0 a:0 c:0)</h4>-->
+<!--                  <p class="text-muted">该图表显示了过去36小时内的流量趋势 </p>-->
+<!--                  <div id="total-sales-chart-legend"></div>                  -->
+<!--                </div>-->
+<!--                <canvas id="total-sales-chart"></canvas>-->
               </div>
             </div>
           </div>

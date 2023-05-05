@@ -148,13 +148,24 @@ $data['task']['userFinishCount'] = $user_task_finish_count;
 
 //任务完成人数
 $result = $conn->query("SELECT task_id, count(*) finish FROM qa_taskfinish group by task_id");
+
+$allTasks = $conn->query("SELECT id FROM qa_task");
+
 $taskids = array();
 $taskFinish = array();
 $taskFinish1 = array();
+$taskN = 0;
+
+while ($row = $allTasks->fetch_assoc()) {
+    $taskFinish1[(int)$row['id']] = 0;
+    $taskids[] = (int)$row['id'];
+    $taskN++;
+}
+
 while ($row = $result->fetch_assoc()) {
     $taskFinish1[(int)$row['task_id']] = $row['finish'];
-    $taskids[] = (int)$row['task_id'];
 }
+
 
 sort($taskids);
 foreach ($taskids as $taskid) {
@@ -163,6 +174,7 @@ foreach ($taskids as $taskid) {
 
 $data['task']['taskFinishids'] = $taskids;
 $data['task']['taskFinishCount'] = $taskFinish;
+$data['task']['taskCount'] = $taskN;
 
 //问答挑战
 // TODO 需要改为问答挑战的id。

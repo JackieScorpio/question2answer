@@ -32,6 +32,36 @@ function task_finished_count($cat, $user_id, $start, $end) {
         $user_id, $cat, $start, $end
     ));
 }
+function task_finished_time($cat, $user_id, $start, $end, $num) {
+    if ($cat == 'vote') {
+        $taskinfo = qa_db_read_all_assoc(qa_db_query_sub(
+            "SELECT * FROM ^eventlog WHERE userid = # AND datetime > # AND datetime < # AND event like # order by datetime",
+            $user_id, $start, $end, '%vote%'
+        ));
+        $index = 0;
+        foreach ($taskinfo as $key => $value) {
+            $index++;
+            if ($index == $num) {
+                return $value['datetime'];
+            }
+        }
+    }
+    else {
+        $taskinfo = qa_db_read_all_assoc(qa_db_query_sub(
+            "SELECT * FROM ^eventlog WHERE userid = # AND event = # AND datetime > # AND datetime < # order by datetime",
+            $user_id, $cat, $start, $end
+        ));
+        $index = 0;
+        foreach ($taskinfo as $key => $value) {
+            $index++;
+            if ($index == $num) {
+                return $value['datetime'];
+            }
+        }
+    }
+
+}
+
 
 // Check that we're logged in
 
@@ -57,8 +87,8 @@ $qa_content = qa_content_prepare(true);
 
 $qa_content['title'] = qa_lang_html('misc/my_task_title');
 
+$qa_content['custom'] = '<div><h2>当前任务</h2>';
 if (!empty($taskInfo)) {
-    $qa_content['custom'] = '';
     foreach ($taskInfo as $key => $value) {
         $taskdesc = str_replace('?', $value['count'], $value['description']);
 
@@ -104,8 +134,40 @@ if (!empty($taskInfo)) {
     }
 }
 
+// 已完成任务
+
+// 获取用户的所有完成任务
+$taskFinishInfo = qa_db_read_all_assoc(qa_db_query_sub(
+    'SELECT 
+                *
+           FROM 
+               ^taskfinish tf, ^task t
+           where tf.user_id = # and tf.task_id = t.id
+          ', $userid
+));
 
 
+$qa_content['custom'] .= '</div>
+<div>
+<h2>已完成任务</h2>';
+
+if (!empty($taskFinishInfo)) {
+    foreach ($taskFinishInfo as $key => $value) {
+        $taskdesc = str_replace('?', $value['count'], $value['description']);
+
+        $finished_time = task_finished_time($value['cat'], $userid, $value['started'], $value['ended'], $value['count']);
+
+        $qa_content['custom'] = $qa_content['custom'] . '<details>
+<summary class="qa-task-list-finish">'. $taskdesc . '</summary>
+<ol class="qa-task-list-item">完成时间: ' . $finished_time . '</ol>
+<ol class="qa-task-list-item">完成奖励: ' . $value['reward'] . '积分-(已自动获取)</ol>
+</details>';
+
+    }
+}
+
+
+$qa_content['custom'] .= '</div>';
 
 
 // Sub navigation for account pages and suggestion
