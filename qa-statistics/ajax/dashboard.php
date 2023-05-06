@@ -120,7 +120,7 @@ for ($i = 6; $i >= 0; $i--) {
                 WHERE event = \'u_login\' AND datetime >= '.$date1.'
                   AND datetime < '.$date2)->fetch_row();
     $logincount[] = $result[0];
-    $maxlogincount = max($maxcount, $result[0]);
+    $maxlogincount = max($maxlogincount, $result[0]);
     $weeklogindate[] = $date;
 }
 $data['chartlogin']['logincount'] = $logincount;
