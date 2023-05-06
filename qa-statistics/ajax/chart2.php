@@ -178,11 +178,11 @@ $data['task']['taskCount'] = $taskN;
 
 //问答挑战
 // TODO 需要改为问答挑战的id。
-$result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'Q' AND catidpath1 = 1")->fetch_row();
+$result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'Q' AND catidpath1 = 6")->fetch_row();
 $challenge_question = $result[0];
 
 // TODO 需要改为问答挑战的id。
-$result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'A' AND catidpath1 = 1")->fetch_row();
+$result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'A' AND catidpath1 = 6")->fetch_row();
 $challenge_answer = $result[0];
 
 $data['challenge']['question'] = (int)$challenge_question;

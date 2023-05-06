@@ -118,7 +118,7 @@ while ($user = $users->fetch_assoc()) {
     $taskcount = $result[0];
 
     // TODO 更改问答挑战id为6
-    $result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'A' AND catidpath1 = 1 AND userid = $userid")->fetch_row();
+    $result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'A' AND catidpath1 = 6 AND userid = $userid")->fetch_row();
     $challengecount = $result[0];
 
     $game = array();
