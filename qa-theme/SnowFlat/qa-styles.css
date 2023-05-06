@@ -1235,6 +1235,10 @@ blockquote p {
 	margin: 5px 5px 0 0;
 }
 
+.qam-q-list-close-icon-adjust-style {
+	margin: 0
+}
+
 .qam-qa-list-meta-box {
 	display: block;
 }
