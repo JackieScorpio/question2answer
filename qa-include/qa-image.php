@@ -52,7 +52,7 @@ $cachetype = 'i_' . $size;
 
 $content = qa_db_cache_get($cachetype, $blobid); // see if we've cached the scaled down version
 
-header('Cache-Control: max-age=2592000, public'); // allows browsers and proxies to cache images too
+header('Cache-Control: max-age=86400, public'); // allows browsers and proxies to cache images too
 
 if (isset($content)) {
 	header('Content-Type: image/jpeg');

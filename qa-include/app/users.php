@@ -208,7 +208,7 @@ if (QA_FINAL_EXTERNAL_USERS) {
 		if (qa_to_override(__FUNCTION__)) { $args=func_get_args(); return qa_call_override(__FUNCTION__, $args); }
 
 		// if $remember is true, store in browser for a month, otherwise store only until browser is closed
-		setcookie('qa_session', $handle . '/' . $sessioncode . '/' . ($remember ? 1 : 0), $remember ? (time() + 2592000) : 0, '/', QA_COOKIE_DOMAIN, (bool)ini_get('session.cookie_secure'), true);
+		setcookie('qa_session', $handle . '/' . $sessioncode . '/' . ($remember ? 1 : 0), $remember ? (time() + 86400) : 0, '/', QA_COOKIE_DOMAIN, (bool)ini_get('session.cookie_secure'), true);
 	}
 
 
