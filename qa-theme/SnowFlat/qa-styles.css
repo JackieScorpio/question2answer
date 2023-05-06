@@ -3890,6 +3890,13 @@ table.task-management-table tbody tr:nth-child(even) {
 	padding: 5px 10px;
 	border-radius: 5px;
 }
+.task-management-visualization-btn {
+	background-color: #52b0c0;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
 
 /*------[ rank ]------*/
 .ques-section {
@@ -4106,7 +4113,7 @@ table.task-management-table tbody tr:nth-child(even) {
 	bottom: 0;
 	left: 10px;
 	display: block;
-	width: 280px;
+	width: 650px;
 	height: 1px;
 	content: '';
 	background-color: #ededed;

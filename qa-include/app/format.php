@@ -610,9 +610,10 @@ function qa_post_html_fields($post, $userid, $cookieid, $usershtml, $dummy, $opt
                 $fields['who']['title'] = '';
                 $levels[1] += $levels[2] + $levels[3];
                 $levels[2] += $levels[3];
+                $badgeurl = qa_path_html('user/' . $useraccount['handle'] . '/badge');
                 for ($i = 1; $i <= 3; ++$i) {
                     if ($levels[$i] > 0) {
-                        $fields['who']['title'] = $fields['who']['title'] . $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 15px;height: 15px"> ';
+                        $fields['who']['title'] = $fields['who']['title'] . $levels[$i] . '<a href="'. $badgeurl .'"><img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 15px;height: 15px"></a> ';
                     }
                 }
             }
@@ -1481,6 +1482,11 @@ function qa_users_sub_navigation()
 	$showNewUsersPage = !qa_user_permit_error('permit_view_new_users_page');
 	$showSpecialUsersPage = !qa_user_permit_error('permit_view_special_users_page');
 
+    $menuItems['users/rank'] = array(
+        'label' => qa_lang_html('main/highest_rank'),
+        'url' => qa_path_html('users/rank'),
+    );
+
 	if ($moderatorPlus || $showNewUsersPage || $showSpecialUsersPage) {
 		// We want to show this item when more than one item should be displayed
 		$menuItems['users$'] = array(
@@ -1510,16 +1516,13 @@ function qa_users_sub_navigation()
 		);
 	}
 
-    // 取消注释启动排行榜
-//    $menuItems['users$'] = array(
-//        'label' => qa_lang_html('main/highest_users'),
-//        'url' => qa_path_html('users'),
-//    );
-//
-//    $menuItems['users/rank'] = array(
-//        'label' => qa_lang_html('main/highest_rank'),
-//        'url' => qa_path_html('users/rank'),
-//    );
+//     取消注释启动排行榜
+    $menuItems['users$'] = array(
+        'label' => qa_lang_html('main/highest_users'),
+        'url' => qa_path_html('users'),
+    );
+
+
 
 	return $menuItems;
 }

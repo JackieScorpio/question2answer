@@ -1,24 +1,5 @@
 <?php
 
-/*
-	Question2Answer by Gideon Greenspan and contributors
-	http://www.question2answer.org/
-
-	Description: Controller for page manage user's badges
-
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	More about this license: http://www.question2answer.org/license.php
-*/
 
 if (!defined('QA_VERSION')) { // don't allow this page to be requested directly from browser
     header('Location: ../../');
@@ -118,14 +99,19 @@ $qa_content['custom'] = '<div style="overflow-x: scroll">';
 
 $qa_content['custom'] .= '<input id = "user-statistics-search" placeholder="请输入要查找的用户名或姓名" style="width: 200px">
 <button class="task-management-search-btn" onclick="searchUserStat()">搜索</button>
-<button class="task-management-reset-btn" onclick="resetUserStat()">重置</button>';
+<button class="task-management-reset-btn" onclick="resetUserStat()">重置</button>
+<a href="./qa-statistics/index.html"><button class="task-management-visualization-btn"">可视化界面</button></a>';
 
 $qa_content['custom'] .= '
   <table class="user-statistics-management-table">
   <thead>
     <tr>
-      <th>用户名</th>
-      <th>真实姓名</th>
+      <th>
+        用户名
+      </th>
+      <th>
+        真实姓名
+      </th>
       <th onclick="sortStatisticsTable(2, this)" class = "user-statistics-desc">回答数</th>
       <th onclick="sortStatisticsTable(3, this)" class = "user-statistics-desc">提问数</th>
       <th onclick="sortStatisticsTable(4, this)" class = "user-statistics-desc">被点赞数</th>

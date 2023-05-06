@@ -1,25 +1,5 @@
 <?php
-/*
-	Question2Answer by Gideon Greenspan and contributors
-	http://www.question2answer.org/
 
-	Description: Language phrases commonly used throughout Q2A
-
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	More about this license: http://www.question2answer.org/license.php
-
-	translate by Hongbo Yin<root@yinhongbo.com>
-*/
 
 return array(
     'a_commented_body' => "^c_handle评论了你在^site_title的回答：\n\n^open^c_content^close\n\n你的回答是：^open^c_context^close\n\n添加回复请点击下面链接：\n^url\n\n该邮件为系统所发，请勿直接回复本邮件！谢谢！\n\n^site_title",

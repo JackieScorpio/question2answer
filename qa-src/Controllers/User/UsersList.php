@@ -206,10 +206,76 @@ class UsersList extends BaseController
             $sortcol['badge3'] = $levels[3];
             $sortcol['levels'] = $levels;
 
-            $sortcol['value'] = $userp['points'] + $levels[1] * 200 +  $levels[2] * 500 + $levels[3] * 1000;
+            //$sortcol['value'] = $userp['points'] + $levels[1] * 200 +  $levels[2] * 500 + $levels[3] * 1000;
             $sortcol['handle'] = $useraccounts[$userid]['handle'];
 
             $usersort[$userid] = $sortcol;
+        }
+
+        $input_matrix = array();
+        foreach ($userpoint as $userp) {
+            $topsis_user = array();
+            $userid = $userp['userid'];
+            // 在线时长
+            $topsis_user[] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
+            // 登陆天数
+            $topsis_user[] = (int)$useraccounts[$userid]['logindays'];
+
+            // 问答数量
+            $topsis_user[] = (int)$userp['aposts'];
+            $topsis_user[] = (int)$userp['qposts'];
+
+            // 问答质量
+            $topsis_user[] = (int)$userp['upvoteds'];
+            $topsis_user[] = (int)$userp['aselecteds'];
+
+            // 徽章系统，根据获取难度权重，低级徽章1，中级徽章5，高级徽章10
+            $topsis_user[] = $usersort[$userid]['badge1'] * 1 + $usersort[$userid]['badge2'] * 5 + $usersort[$userid]['badge1'] * 10;
+
+            // 任务系统 完成任务数
+            $taskFinish = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE user_id = #', $userid));
+            $topsis_user[] = $taskFinish;
+
+            // 积分
+            $topsis_user[] = (int)$userp['points'];
+
+            $input_matrix[] = $topsis_user;
+
+            // 记录各个信息以显示
+            $usersort[$userid]['totalactiontime'] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
+            $usersort[$userid]['logindays'] = (int)$useraccounts[$userid]['logindays'];
+            $usersort[$userid]['aposts'] = (int)$userp['aposts'];
+            $usersort[$userid]['qposts'] = (int)$userp['qposts'];
+            $usersort[$userid]['upvoteds'] = (int)$userp['upvoteds'];
+            $usersort[$userid]['aselecteds'] = (int)$userp['aselecteds'];
+            $usersort[$userid]['taskfinish'] = $taskFinish;
+
+
+        }
+        $totalnum = 9;
+
+        $weight_matrix = array(0.0285, 0.0168, 0.0799, 0.0799, 0.0799, 0.21, 0.1838, 0.1373, 0.1838);
+
+//        for ($i = 0; $i<$totalnum; ++$i) {
+//            $weight_matrix[$i] = 1/$totalnum;
+//        }
+
+
+        $impact_matrix[] = array();
+        for ($i = 0; $i<$totalnum; ++$i) {
+            $impact_matrix[$i] = 1;
+        }
+//        echo var_dump($input_matrix);
+//        echo var_dump(count($weight_matrix));
+//        echo var_dump(count($impact_matrix));
+
+        $topsis_ans = $this -> topsis($input_matrix, $weight_matrix, $impact_matrix);
+        $topsis_index = 0;
+
+        foreach ($userpoint as $userp) {
+            $userid = $userp['userid'];
+            $usersort[$userid]['value'] = $topsis_ans[$topsis_index];
+            $topsis_index++;
         }
 
         array_multisort(array_column($usersort,'value'),SORT_DESC, $usersort);
@@ -227,32 +293,50 @@ class UsersList extends BaseController
             if ($index == 1) {
                 $index++;
                 $itemicon = 'item-icon001';
-                $qa_content['custom'] .= '<li class="ques-card-list-noe" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             }
             elseif ($index == 2) {
                 $index++;
                 $itemicon = 'item-icon002';
-                $qa_content['custom'] .= '<li class="ques-card-list-two" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             }
             elseif ($index == 3) {
                 $index++;
                 $itemicon = 'item-icon003';
-                $qa_content['custom'] .= '<li class="ques-card-list-three" style="list-style-type:none;">';
+                $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
             } else {
                 $qa_content['custom'] .= '<li class="" style="list-style-type:none;">';
                 $index++;
             }
+
             $badgeinamge = '';
+            $badgeinamge .= $item['qposts'] . '<img src = "./qa-theme/general/rank-question.png" style="width: 20px;height: 20px" title="提问数"> ';
+            $badgeinamge .= $item['aposts'] . '<img src = "./qa-theme/general/rank-answer.png" style="width: 20px;height: 20px" title="回答数"> ';
+            $badgeinamge .= $item['taskfinish'] . '<img src = "./qa-theme/general/rank-task.png" style="width: 20px;height: 20px" title="任务完成数"> ';
+
             for ($i = 1; $i <= 3; ++$i) {
                 $levels = $item['levels'];
                 if ($levels[$i] > 0) {
                     $badgeinamge .= $levels[$i] . '<img src = "./qa-theme/general/badge-' . $i . '.png" style="width: 20px;height: 20px"> ';
                 }
             }
+
+//            $qa_content['custom'] .= '<div class="ques-list-box">
+//					<div class="ques-list-head">
+//						<div class="ques-list-image"><img src="./qa-theme/general/rank/user.png" alt=""></div>
+//					</div>
+//					<div class="ques-list-name">
+//						<div class="ques-list-name-head"><a href='. $userurl .'>'. $item['handle'] . '</a></div>
+//						<div class="ques-list-name-text">积分: '. $item['points'] .'</div>
+//					</div>
+//					<div class="ques-list-badge-icon">
+//					    ' .$badgeinamge .'
+//					</div>
+//					<span class="ques-qa-top-users-score">'. (int)($item['value']*1000) .'</span>
+//					<span class="ques-list-name-icon '. $itemicon .'">'. ($index-1) .'</span>
+//				</div>';
             $qa_content['custom'] .= '<div class="ques-list-box">
-					<div class="ques-list-head">
-						<div class="ques-list-image"><img src="./qa-theme/general/rank/user.png" alt=""></div>
-					</div>
+					
 					<div class="ques-list-name">
 						<div class="ques-list-name-head"><a href='. $userurl .'>'. $item['handle'] . '</a></div>
 						<div class="ques-list-name-text">积分: '. $item['points'] .'</div>
@@ -260,7 +344,7 @@ class UsersList extends BaseController
 					<div class="ques-list-badge-icon">
 					    ' .$badgeinamge .'
 					</div>
-					<span class="ques-qa-top-users-score">'. $item['value'] .'</span>
+					<span class="ques-qa-top-users-score">'. (int)($item['value']*1000) .'</span>
 					<span class="ques-list-name-icon '. $itemicon .'">'. ($index-1) .'</span>
 				</div>';
 
@@ -429,5 +513,87 @@ GROUP BY parentid)', $userpoints['userid']));
             return 1;
         }
         return 0;
+    }
+
+    private function topsis($input_matrix, $weight_matrix, $impact_matrix) {
+        // Define the normalized matrix as a 2D array with n rows and m columns
+        $normalized_matrix = array();
+
+        // Calculate the sum of squares for each column
+        $sum_of_squares = array();
+        for ($j = 0; $j < count($input_matrix[0]); $j++) {
+            $sum_of_squares[$j] = 0;
+        }
+
+        // Calculate the square root of the sum of squares for each column
+        $sqrt_sum_of_squares = array();
+
+        // Normalize the input matrix using the weight matrix
+        for ($i = 0; $i < count($input_matrix); $i++) {
+            $row = array();
+            for ($j = 0; $j < count($input_matrix[$i]); $j++) {
+                $row[] = $input_matrix[$i][$j] * $weight_matrix[$j];
+                $sum_of_squares[$j] += pow($input_matrix[$i][$j], 2);
+            }
+            $normalized_matrix[] = $row;
+        }
+
+        for ($i = 0; $i < count($sum_of_squares); $i++) {
+            $sqrt_sum_of_squares[$i] = sqrt($sum_of_squares[$i]);
+        }
+
+        // Calculate the weighted normalized decision matrix
+        $weighted_normalized_matrix = array();
+        for ($i = 0; $i < count($normalized_matrix); $i++) {
+            $row = array();
+            for ($j = 0; $j < count($normalized_matrix[$i]); $j++) {
+                $row[] = $normalized_matrix[$i][$j] / $sqrt_sum_of_squares[$j];
+            }
+            $weighted_normalized_matrix[] = $row;
+        }
+
+        // Calculate the ideal and negative-ideal solutions
+        $ideal_solution = array();
+        $negative_ideal_solution = array();
+        for ($i = 0; $i < count($weighted_normalized_matrix[0]); $i++) {
+            $column = array_column($weighted_normalized_matrix, $i);
+            if ($impact_matrix[$i] == 1) {
+                $ideal_solution[] = max($column);
+                $negative_ideal_solution[] = min($column);
+            } else {
+                $ideal_solution[] = min($column);
+                $negative_ideal_solution[] = max($column);
+            }
+        }
+
+        // Calculate the distance to the ideal and negative-ideal solutions for each alternative
+        $distance_to_ideal = array();
+        $distance_to_negative_ideal = array();
+        for ($i = 0; $i < count($weighted_normalized_matrix); $i++) {
+            $row = $weighted_normalized_matrix[$i];
+            $d_plus = 0;
+            $d_minus = 0;
+            for ($j = 0; $j < count($row); $j++) {
+                $d_plus += pow($row[$j] - $ideal_solution[$j], 2);
+                $d_minus += pow($row[$j] - $negative_ideal_solution[$j], 2);
+            }
+            $distance_to_ideal[] = sqrt($d_plus);
+            $distance_to_negative_ideal[] = sqrt($d_minus);
+        }
+
+        // Calculate the performance score for each alternative
+        $performance_score = array();
+        for ($i = 0; $i < count($distance_to_negative_ideal); $i++) {
+            $performance_score[] = $distance_to_negative_ideal[$i] / ($distance_to_ideal[$i] + $distance_to_negative_ideal[$i]);
+        }
+
+        return $performance_score;
+
+        // Rank the alternatives based on their performance score
+//        arsort($performance_score);
+//        $ranked_alternatives = array_keys($performance_score);
+//
+//
+//        return array($ranked_alternatives, $performance_score);
     }
 }
