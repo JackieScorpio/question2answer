@@ -182,13 +182,20 @@ class UsersList extends BaseController
         }
 
         $userpoints = array();
+        // TODO 管理员和助教不参与排名
+        $adminids = array(1);
+
         foreach ($userpoint as $userp) {
+            if (in_array((int)$userp['userid'], $adminids)) {
+                continue;
+            }
             $userpoints[$userp['userid']] = $userp;
         }
+
         $badgeInfo = qa_db_read_all_assoc(qa_db_query_sub('SELECT * FROM ^badge'));
 
         $usersort = array();
-        foreach ($userpoint as $userp) {
+        foreach ($userpoints as $userp) {
             $userid = $userp['userid'];
 
             $sortcol = array();
@@ -213,7 +220,7 @@ class UsersList extends BaseController
         }
 
         $input_matrix = array();
-        foreach ($userpoint as $userp) {
+        foreach ($userpoints as $userp) {
             $topsis_user = array();
             $userid = $userp['userid'];
             // 在线时长
@@ -272,7 +279,7 @@ class UsersList extends BaseController
         $topsis_ans = $this -> topsis($input_matrix, $weight_matrix, $impact_matrix);
         $topsis_index = 0;
 
-        foreach ($userpoint as $userp) {
+        foreach ($userpoints as $userp) {
             $userid = $userp['userid'];
             $usersort[$userid]['value'] = $topsis_ans[$topsis_index];
             $topsis_index++;
@@ -525,23 +532,24 @@ GROUP BY parentid)', $userpoints['userid']));
     }
 
     private function topsis($input_matrix, $weight_matrix, $impact_matrix) {
-        // Define the normalized matrix as a 2D array with n rows and m columns
+        // 定义标准化矩阵为具有n行m列的2D阵列
         $normalized_matrix = array();
 
-        // Calculate the sum of squares for each column
+        // 每列的平方和
         $sum_of_squares = array();
+
+        // 每列平方和的平方根
+        $sqrt_sum_of_squares = array();
+
         for ($j = 0; $j < count($input_matrix[0]); $j++) {
             $sum_of_squares[$j] = 0;
         }
 
-        // Calculate the square root of the sum of squares for each column
-        $sqrt_sum_of_squares = array();
-
-        // Normalize the input matrix using the weight matrix
+        // 构建标准化矩阵
         for ($i = 0; $i < count($input_matrix); $i++) {
             $row = array();
             for ($j = 0; $j < count($input_matrix[$i]); $j++) {
-                $row[] = $input_matrix[$i][$j] * $weight_matrix[$j];
+                $row[] = $input_matrix[$i][$j];
                 $sum_of_squares[$j] += pow($input_matrix[$i][$j], 2);
             }
             $normalized_matrix[] = $row;
@@ -551,7 +559,6 @@ GROUP BY parentid)', $userpoints['userid']));
             $sqrt_sum_of_squares[$i] = sqrt($sum_of_squares[$i]);
         }
 
-        // Calculate the weighted normalized decision matrix
         $weighted_normalized_matrix = array();
         for ($i = 0; $i < count($normalized_matrix); $i++) {
             $row = array();
@@ -561,7 +568,7 @@ GROUP BY parentid)', $userpoints['userid']));
             $weighted_normalized_matrix[] = $row;
         }
 
-        // Calculate the ideal and negative-ideal solutions
+        // 计算最优解和最劣解
         $ideal_solution = array();
         $negative_ideal_solution = array();
         for ($i = 0; $i < count($weighted_normalized_matrix[0]); $i++) {
@@ -575,7 +582,7 @@ GROUP BY parentid)', $userpoints['userid']));
             }
         }
 
-        // Calculate the distance to the ideal and negative-ideal solutions for each alternative
+        // 计算每个备选方案到最优解和最劣解的距离
         $distance_to_ideal = array();
         $distance_to_negative_ideal = array();
         for ($i = 0; $i < count($weighted_normalized_matrix); $i++) {
@@ -583,14 +590,14 @@ GROUP BY parentid)', $userpoints['userid']));
             $d_plus = 0;
             $d_minus = 0;
             for ($j = 0; $j < count($row); $j++) {
-                $d_plus += pow($row[$j] - $ideal_solution[$j], 2);
-                $d_minus += pow($row[$j] - $negative_ideal_solution[$j], 2);
+                $d_plus += $weight_matrix[$j] * pow($row[$j] - $ideal_solution[$j], 2);
+                $d_minus += $weight_matrix[$j] * pow($row[$j] - $negative_ideal_solution[$j], 2);
             }
             $distance_to_ideal[] = sqrt($d_plus);
             $distance_to_negative_ideal[] = sqrt($d_minus);
         }
 
-        // Calculate the performance score for each alternative
+        // 计算每个备选方案的得分
         $performance_score = array();
         for ($i = 0; $i < count($distance_to_negative_ideal); $i++) {
             $performance_score[] = $distance_to_negative_ideal[$i] / ($distance_to_ideal[$i] + $distance_to_negative_ideal[$i]);

@@ -1,20 +1,31 @@
 <?php
 // Define the input matrix as a 2D array with n rows and m columns
+//$input_matrix = array(
+//    array(4, 5, 8, 20),
+//    array(7, 6, 2, 0),
+//    array(5, 7, 4, 10),
+//    array(6, 10, 0, 15),
+//    array(8, 2, 5, 5),
+//    // add more rows as needed
+//);
 $input_matrix = array(
-    array(1, 2, 3, 4),
-    array(4, 3, 2, 1),
-    array(2, 4, 1, 3),
+    array(0.1, 5, 5000, 4.7),
+    array(0.2, 6, 6000, 5.6),
+    array(0.4, 7, 7000, 6.7),
+    array(0.9, 10, 10000, 2.3),
+
+    array(1.2, 2, 400, 1.8),
     // add more rows as needed
 );
 
 // Define the weight matrix as a 1D array with m elements
-$wweight_matrix = array(0.25, 0.25, 0.25, 0.25);
+$wweight_matrix = array(0.2, 0.3, 0.4, 0.1);
 
 // Define the impact matrix as a 1D array with m elements
-$iimpact_matrix = array(1, 1, 1, -1);
+$iimpact_matrix = array(1, 1, 1, 1);
 
 
-echo topsis($input_matrix, $wweight_matrix, $iimpact_matrix);
+echo var_dump(topsis($input_matrix, $wweight_matrix, $iimpact_matrix));
 
 
 function topsis($input_matrix, $weight_matrix, $impact_matrix) {
@@ -27,11 +38,11 @@ function topsis($input_matrix, $weight_matrix, $impact_matrix) {
     // 每列平方和的平方根
     $sqrt_sum_of_squares = array();
 
-    // 使用权重矩阵规范化输入矩阵
+    // 构建标准化矩阵
     for ($i = 0; $i < count($input_matrix); $i++) {
         $row = array();
         for ($j = 0; $j < count($input_matrix[$i]); $j++) {
-            $row[] = $input_matrix[$i][$j] * $weight_matrix[$j];
+            $row[] = $input_matrix[$i][$j];
             $sum_of_squares[$j] += pow($input_matrix[$i][$j], 2);
         }
         $normalized_matrix[] = $row;
@@ -41,7 +52,6 @@ function topsis($input_matrix, $weight_matrix, $impact_matrix) {
         $sqrt_sum_of_squares[$i] = sqrt($sum_of_squares[$i]);
     }
 
-    // 计算加权归一化决策矩阵
     $weighted_normalized_matrix = array();
     for ($i = 0; $i < count($normalized_matrix); $i++) {
         $row = array();
@@ -50,6 +60,7 @@ function topsis($input_matrix, $weight_matrix, $impact_matrix) {
         }
         $weighted_normalized_matrix[] = $row;
     }
+    echo var_dump($weighted_normalized_matrix);
 
     // 计算最优解和最劣解
     $ideal_solution = array();
@@ -73,12 +84,14 @@ function topsis($input_matrix, $weight_matrix, $impact_matrix) {
         $d_plus = 0;
         $d_minus = 0;
         for ($j = 0; $j < count($row); $j++) {
-            $d_plus += pow($row[$j] - $ideal_solution[$j], 2);
-            $d_minus += pow($row[$j] - $negative_ideal_solution[$j], 2);
+            $d_plus += $weight_matrix[$j] * pow($row[$j] - $ideal_solution[$j], 2);
+            $d_minus += $weight_matrix[$j] * pow($row[$j] - $negative_ideal_solution[$j], 2);
         }
         $distance_to_ideal[] = sqrt($d_plus);
         $distance_to_negative_ideal[] = sqrt($d_minus);
     }
+    echo var_dump($distance_to_ideal);
+    echo var_dump($distance_to_negative_ideal);
 
     // 计算每个备选方案的得分
     $performance_score = array();
