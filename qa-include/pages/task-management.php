@@ -188,6 +188,7 @@ $qa_content['custom'] .= '<div style="overflow-x: scroll">
       <th>描述</th>
       <th>所需次数</th>
       <th>奖励</th>
+      <th>完成人数</th>
     </tr>
   </thead>
   <tbody>';
@@ -200,6 +201,7 @@ foreach ($tasks as $task) {
     $qa_content['custom'] .= '<td>' . str_replace('?', $task['count'], $task['description']) . '</td>';
     $qa_content['custom'] .= '<td>' . $task['count'] . '</td>';
     $qa_content['custom'] .= '<td>' . $task['reward'] . '</td>';
+    $qa_content['custom'] .= '<td>' . qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE task_id = #', $task['id'])) . '</td>';
     $qa_content['custom'] .= '</tr>';
 }
 

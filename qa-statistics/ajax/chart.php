@@ -93,14 +93,14 @@ $result = $conn->query("SELECT count(*) FROM (SELECT distinct parentid FROM qa_p
 $question_with_answer = $result[0];
 
 $data['pie1']['answered'] = $question_with_answer;
-$data['pie1']['unanswered'] = $totalquestion - $question_with_answer;
+$data['pie1']['unanswered'] = min(0, $totalquestion - $question_with_answer);
 
 // 问题已解决、问题未解决
 $result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'Q' AND selchildid is not null")->fetch_row();
 $question_with_select = $result[0];
 
 $data['pie2']['solved'] = $question_with_select;
-$data['pie2']['unsolved'] = $totalquestion - $question_with_select;
+$data['pie2']['unsolved'] = min(0, $totalquestion - $question_with_select);
 
 
 //回答被投票、回答未被投票
@@ -112,7 +112,7 @@ $result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'A' AND upvot
 $answer_with_vote = $result[0];
 
 $data['pie3']['voted'] = $answer_with_vote;
-$data['pie3']['unvoted'] = $totalanswer - $answer_with_vote;
+$data['pie3']['unvoted'] = min(0, $totalanswer - $answer_with_vote);
 
 $result = $conn->query("SELECT count(*) FROM qa_posts WHERE type = 'C'")->fetch_row();
 $data['pie4']['comment'] = $result[0];

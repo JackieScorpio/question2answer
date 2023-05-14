@@ -297,7 +297,7 @@ $qa_content['form_profile'] = array(
 		'realname' => array(
 			'label' => qa_lang_html('users/realname_label'),
 			'tags' => 'name="realname"',
-			'value' => $useraccount['realname'] !== null ? $useraccount['realname'] : $inrealname,
+            'value' => $useraccount['realname'] !== null ? $useraccount['realname'] : $inrealname,
 			'type' => $useraccount['realname'] !== null ? 'static' : 'text',
 			'error' => qa_html(@$errors['realname']),
 		),
