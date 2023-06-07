@@ -183,7 +183,10 @@ class UsersList extends BaseController
 
         $userpoints = array();
         // TODO 管理员和助教不参与排名
-        $adminids = array(1);
+        // 所有学生的userid：35, 31, 21, 30, 24, 20, 15, 18, 16, 26, 14, 32, 8, 9, 26, 22, 11, 25, 29, 33, 19, 28, 13, 7, 17, 12
+
+        // $adminids 中包含除学生之外的用户id，保证只在学生中计算topsis
+        $adminids = array(1, 2, 3, 4, 6, 10, 23, 34, 66, 67, 75);
 
         foreach ($userpoint as $userp) {
             if (in_array((int)$userp['userid'], $adminids)) {
@@ -219,34 +222,96 @@ class UsersList extends BaseController
             $usersort[$userid] = $sortcol;
         }
 
-        $input_matrix = array();
+        // $input_matrix = array();
+
+        // 一级指标-回答贡献(二维数组)
+        $input_matrix_answer_contribution = array();
+        // 一级指标-提问贡献(二维数组)
+        $input_matrix_question_contribution = array();
+        // 一级指标-参与贡献(二维数组)
+        $input_matrix_participation_contribution = array();
+
         foreach ($userpoints as $userp) {
             $topsis_user = array();
             $userid = $userp['userid'];
-            // 在线时长
-            $topsis_user[] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
-            // 登陆天数
-            $topsis_user[] = (int)$useraccounts[$userid]['logindays'];
 
-            // 问答数量
-            $topsis_user[] = (int)$userp['aposts'];
-            $topsis_user[] = (int)$userp['qposts'];
+            
+            /* 一级指标：回答贡献 */
+            $input_matrix_answer_contribution_row = array();
+                // 二级指标：首答的次数Fa（First answer）
+            $input_matrix_answer_contribution_row[] = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) from qa_posts where userid = # AND postid in (
+            SELECT MIN(postid) AS first_answer_id
+            FROM qa_posts
+            WHERE type = \'A\'
+            GROUP BY parentid)', $userid));
 
-            // 问答质量
-            $topsis_user[] = (int)$userp['upvoteds'];
-            $topsis_user[] = (int)$userp['aselecteds'];
+                // 二级指标：回答被采纳次数Sa (Sloved of answer)
+            $input_matrix_answer_contribution_row[] = (int)$userp['aselecteds'];
 
-            // 徽章系统，根据获取难度权重，低级徽章1，中级徽章5，高级徽章10
-            $topsis_user[] = $usersort[$userid]['badge1'] * 1 + $usersort[$userid]['badge2'] * 5 + $usersort[$userid]['badge1'] * 10;
+                // 二级指标：回答的平均得票数Va (Votes of answer)
+            $input_matrix_answer_contribution_row[] = (int)($userp['avoteds'] / 2); // avoteds => 回答被投票对应的分数，upvote加2分，downvote减2分
 
-            // 任务系统 完成任务数
+                // 二级指标：回答次数Pa (Posts of answer)
+            $input_matrix_answer_contribution_row[] = (int)$userp['aposts'];
+
+            // 把一名学生的 4 个二级指标放到一行中
+            $input_matrix_answer_contribution[] = $input_matrix_answer_contribution_row; 
+
+            /* 一级指标：提问贡献 */
+            $input_matrix_question_contribution_row = array();
+
+                // 二级指标：提问次数Pq (Posts of question)
+            $input_matrix_question_contribution_row[] = (int)$userp['qposts'];
+
+                // 二级指标：问题平均得票数Vq (Votes of question)
+            $input_matrix_question_contribution_row[] = (int)$userp['qvoteds'];
+
+                // 二级指标：问题被点击数Cq (Clicks of question)
+            $input_matrix_question_contribution_row[] = (int)qa_db_read_one_value(qa_db_query_sub('SELECT sum(clicktimes) FROM ^posts WHERE userid = # AND type = \'Q\'', $userid));
+
+            $input_matrix_question_contribution[] = $input_matrix_question_contribution_row;
+
+            /* 一级指标：参与贡献 */
+            $input_matrix_participation_contribution_row = array();
+
+                // 二级指标：投票次数Vp (Voting of post) 对问题或回答进行投票的次数
+            $input_matrix_participation_contribution_row[] = (int)($userp['qupvotes'] + $userp['qdownvotes'] + $userp['aupvotes'] + $userp['adownvotes']);
+
+                // 二级指标：论坛访问总天数 Dv (Days of visiting)
+            $input_matrix_participation_contribution_row[] = (int)$useraccounts[$userid]['logindays'];
+
+                // 二级指标：活跃在线总时长Od (active Online duration)
+            $input_matrix_participation_contribution_row[] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
+
+                // 二级指标：发表的评论数Pc (Posts of comments)
+            $input_matrix_participation_contribution_row[] = (int)$userp['cposts'];
+
+            $input_matrix_participation_contribution[] = $input_matrix_participation_contribution_row;
+
+            // // 在线时长
+            // $topsis_user[] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
+            // // 登陆天数
+            // $topsis_user[] = (int)$useraccounts[$userid]['logindays'];
+
+            // // 问答数量
+            // $topsis_user[] = (int)$userp['aposts'];
+            // $topsis_user[] = (int)$userp['qposts'];
+
+            // // 问答质量
+            // $topsis_user[] = (int)$userp['upvoteds'];
+            // $topsis_user[] = (int)$userp['aselecteds'];
+
+            // // 徽章系统，根据获取难度权重，低级徽章1，中级徽章5，高级徽章10
+            // $topsis_user[] = $usersort[$userid]['badge1'] * 1 + $usersort[$userid]['badge2'] * 5 + $usersort[$userid]['badge1'] * 10;
+
+            // // 任务系统 完成任务数
             $taskFinish = (int)qa_db_read_one_value(qa_db_query_sub('SELECT count(*) FROM ^taskfinish WHERE user_id = #', $userid));
-            $topsis_user[] = $taskFinish;
+            // $topsis_user[] = $taskFinish;
 
-            // 积分
-            $topsis_user[] = (int)$userp['points'];
+            // // 积分
+            // $topsis_user[] = (int)$userp['points'];
 
-            $input_matrix[] = $topsis_user;
+            // $input_matrix[] = $topsis_user;
 
             // 记录各个信息以显示
             $usersort[$userid]['totalactiontime'] = ((int)$useraccounts[$userid]['totalactiontime']) / 60;
@@ -256,27 +321,34 @@ class UsersList extends BaseController
             $usersort[$userid]['upvoteds'] = (int)$userp['upvoteds'];
             $usersort[$userid]['aselecteds'] = (int)$userp['aselecteds'];
             $usersort[$userid]['taskfinish'] = $taskFinish;
-
-
         }
-        $totalnum = 9;
 
-        $weight_matrix = array(0.0285, 0.0168, 0.0799, 0.0799, 0.0799, 0.21, 0.1838, 0.1373, 0.1838);
+        // $totalnum = 9;
 
-//        for ($i = 0; $i<$totalnum; ++$i) {
-//            $weight_matrix[$i] = 1/$totalnum;
-//        }
+        // $weight_matrix = array(0.0285, 0.0168, 0.0799, 0.0799, 0.0799, 0.21, 0.1838, 0.1373, 0.1838);
 
+        // $impact_matrix[] = array();
+        // for ($i = 0; $i<$totalnum; ++$i) {
+        //     $impact_matrix[$i] = 1;
+        // }
+        //        echo var_dump($input_matrix);
+        //        echo var_dump(count($weight_matrix));
+        //        echo var_dump(count($impact_matrix));
 
-        $impact_matrix[] = array();
-        for ($i = 0; $i<$totalnum; ++$i) {
-            $impact_matrix[$i] = 1;
-        }
-//        echo var_dump($input_matrix);
-//        echo var_dump(count($weight_matrix));
-//        echo var_dump(count($impact_matrix));
+        $topsis_ans = $this -> getComprehensivePoints($input_matrix_answer_contribution, $input_matrix_question_contribution, $input_matrix_participation_contribution);
+        
+        // 展示 topsis 分数， 算最终分数
+        // $counter = 0;
+        // foreach ($userpoints as $userp) {
+        //     // $topsis_ans 数组中元素的顺序，就是使用 foreach 遍历 $userpoints 的顺序，即 $topsis_ans 中的 si 值和 $userp['userid']是一一对应的
+        //     $userid = $userp['userid'];
 
-        $topsis_ans = $this -> topsis($input_matrix, $weight_matrix, $impact_matrix);
+        //     // 此处由老师指定了Xmax（最高得分）是5分，Xmin（最低得分）是0分
+        //     $final_point = (($topsis_ans[$counter] - min($topsis_ans))/(max($topsis_ans) - min($topsis_ans))) * (5 - 0) + 0;
+        //     echo $final_point.'<br>';
+        //     $counter++;
+        // }
+
         $topsis_index = 0;
 
         foreach ($userpoints as $userp) {
@@ -360,7 +432,7 @@ class UsersList extends BaseController
 					<div class="ques-list-badge-icon">
 					    ' .$badgeinamge .'
 					</div>
-					<span class="ques-qa-top-users-score">'. (int)($item['value']*1000) .'</span>
+					<span class="ques-qa-top-users-score">'. round($item['value'], 4) .'</span>
 					<span class="ques-list-name-icon '. $itemicon .'">'. ($index-1) .'</span>
 				</div>';
 
@@ -531,85 +603,223 @@ GROUP BY parentid)', $userpoints['userid']));
         return 0;
     }
 
-    private function topsis($input_matrix, $weight_matrix, $impact_matrix) {
-        // 定义标准化矩阵为具有n行m列的2D阵列
-        $normalized_matrix = array();
+    private function getComprehensivePoints($input_matrix_answer_contribution, $input_matrix_question_contribution, $input_matrix_participation_contribution) {
+        $answer_contribution_weight_matrix = array(0.0723, 0.5623, 0.2931, 0.0723);
+        $question_contribution_weight_matrix = array(0.1634, 0.5396, 0.2970);
+        $participation_contribution_weight_matrix = array(0.1034, 0.2082, 0.0949, 0.5935);
 
-        // 每列的平方和
-        $sum_of_squares = array();
+        // 根据 topsis 方法算出一级指标综合分数，拿到三个 si 的一维数组
+        // 第i个学生的第k个一级指标的综合分数为S(ik)
+        $si_answer_contribution = $this -> topsis($input_matrix_answer_contribution, $answer_contribution_weight_matrix, true);
+        $si_question_contribution = $this -> topsis($input_matrix_question_contribution, $question_contribution_weight_matrix, true);
+        $si_participation_contribution = $this -> topsis($input_matrix_participation_contribution, $participation_contribution_weight_matrix, true);
+    
+        // 总体贡献权重向量
+        $total_weight_matrix = array(0.6328, 0.2872, 0.0780);
+    
+        // 整理数组，满足每一行为一名学生的三个一级指标的 Si
+        $final_prepared_matrix = array();
 
-        // 每列平方和的平方根
-        $sqrt_sum_of_squares = array();
-
-        for ($j = 0; $j < count($input_matrix[0]); $j++) {
-            $sum_of_squares[$j] = 0;
+        for ($i = 0; $i < count($si_answer_contribution); $i++) {
+            $final_prepared_matrix[] = [$si_answer_contribution[$i], $si_question_contribution[$i], $si_participation_contribution[$i]];
         }
 
-        // 构建标准化矩阵
-        for ($i = 0; $i < count($input_matrix); $i++) {
-            $row = array();
-            for ($j = 0; $j < count($input_matrix[$i]); $j++) {
-                $row[] = $input_matrix[$i][$j];
-                $sum_of_squares[$j] += pow($input_matrix[$i][$j], 2);
-            }
-            $normalized_matrix[] = $row;
-        }
+        // echo count($final_prepared_matrix);
+        // foreach ($final_prepared_matrix as $item) {
+        //     foreach($item as $k) {
+        //         echo $k.' ;';
+        //     }
+        //     echo '<br>';
+        // }
 
-        for ($i = 0; $i < count($sum_of_squares); $i++) {
-            $sqrt_sum_of_squares[$i] = sqrt($sum_of_squares[$i]);
-        }
+        $final_si = $this -> topsis($final_prepared_matrix, $total_weight_matrix);
 
-        $weighted_normalized_matrix = array();
-        for ($i = 0; $i < count($normalized_matrix); $i++) {
-            $row = array();
-            for ($j = 0; $j < count($normalized_matrix[$i]); $j++) {
-                $row[] = $normalized_matrix[$i][$j] / $sqrt_sum_of_squares[$j];
-            }
-            $weighted_normalized_matrix[] = $row;
-        }
-
-        // 计算最优解和最劣解
-        $ideal_solution = array();
-        $negative_ideal_solution = array();
-        for ($i = 0; $i < count($weighted_normalized_matrix[0]); $i++) {
-            $column = array_column($weighted_normalized_matrix, $i);
-            if ($impact_matrix[$i] == 1) {
-                $ideal_solution[] = max($column);
-                $negative_ideal_solution[] = min($column);
-            } else {
-                $ideal_solution[] = min($column);
-                $negative_ideal_solution[] = max($column);
-            }
-        }
-
-        // 计算每个备选方案到最优解和最劣解的距离
-        $distance_to_ideal = array();
-        $distance_to_negative_ideal = array();
-        for ($i = 0; $i < count($weighted_normalized_matrix); $i++) {
-            $row = $weighted_normalized_matrix[$i];
-            $d_plus = 0;
-            $d_minus = 0;
-            for ($j = 0; $j < count($row); $j++) {
-                $d_plus += $weight_matrix[$j] * pow($row[$j] - $ideal_solution[$j], 2);
-                $d_minus += $weight_matrix[$j] * pow($row[$j] - $negative_ideal_solution[$j], 2);
-            }
-            $distance_to_ideal[] = sqrt($d_plus);
-            $distance_to_negative_ideal[] = sqrt($d_minus);
-        }
-
-        // 计算每个备选方案的得分
-        $performance_score = array();
-        for ($i = 0; $i < count($distance_to_negative_ideal); $i++) {
-            $performance_score[] = $distance_to_negative_ideal[$i] / ($distance_to_ideal[$i] + $distance_to_negative_ideal[$i]);
-        }
-
-        return $performance_score;
-
-        // Rank the alternatives based on their performance score
-//        arsort($performance_score);
-//        $ranked_alternatives = array_keys($performance_score);
-//
-//
-//        return array($ranked_alternatives, $performance_score);
+        return $final_si;
     }
+
+    private function normalize($input_array) {
+        // for ($i=0; $i < count($input_array); $i++) {
+        //     for ($j=0; $j < count($input_array[$i]); $j++) {
+        //         echo '第'.$i.'行第'.$j.'列:'.$input_array[$i][$j].' ';
+        //     }
+        // }
+
+        // 行数
+        $row_number = count($input_array);
+        // 列数
+        $column_number = count($input_array[0]);
+
+        // 求出除数：每一列的平方和开根号
+        $divisor = array();
+
+        for ($column = 0; $column < $column_number; $column++) {
+            $value_for_one_column = 0;
+            for ($row = 0; $row < $row_number; $row++) {
+                $value_for_one_column += pow($input_array[$row][$column], 2);
+            }
+            $divisor[] = sqrt($value_for_one_column);
+        }
+
+        // for ($i=0; $i < count($divisor); $i++) {
+        //     echo $divisor[$i].' ';
+        // }
+        // 求解标准化数组
+        $normalized_array = array();
+
+        for ($row = 0; $row < $row_number; $row++) {
+            $new_row = array();
+            for ($column = 0; $column < $column_number; $column++) {
+                $new_row[] = $input_array[$row][$column]/$divisor[$column];
+                // echo '第'.$row.'行第'.$column.'列:'.$normalized_array[$i][$j].' ';
+                // echo '上'.$input_array[$row][$column];
+                // echo '值'.$input_array[$row][$column]/$divisor[$column];
+            }
+            $normalized_array[] = $new_row;
+        }
+        // echo '============'.count($normalized_array[0]);
+        // for ($i=0; $i < count($normalized_array); $i++) {
+        //     for ($j=0; $j < count($normalized_array[$i]); $j++) {
+        //         echo '第'.$i.'行第'.$j.'列:'.$normalized_array[$i][$j].' ';
+        //     }
+        // }
+
+        return $normalized_array;
+    }
+
+    private function getMaximumAndMinimum($input_matrix) {
+        $max_and_min = array();
+        for ($row = 0; $row < count($input_matrix); $row++) {
+            for ($column = 0; $column < count($input_matrix[0]); $column++) {
+                $current_value = $input_matrix[$row][$column];
+                if (!isset($max_and_min[$column])) {
+                    $max_and_min[$column] = array(0 => $current_value, 1=>$current_value);
+                } else {
+                    $max_and_min[$column][0] = max($max_and_min[$column][0], $current_value);
+                    $max_and_min[$column][1] = min($max_and_min[$column][1], $current_value);
+                }
+            }
+        }
+        // for($i=0;$i< count($max_and_min);$i++) {
+        //     echo 'the'.$i.'column:'.'max-'.$max_and_min[$i][0].' min-'.$max_and_min[$i][1].' .';
+        // }
+        return $max_and_min;
+    }
+
+    private function topsis($input_matrix, $weight_matrix, $needNormalization = false) {
+        $prepared_input_matrix = $input_matrix;
+
+        if ($needNormalization) {
+            $prepared_input_matrix = $this -> normalize($input_matrix);
+        }
+
+        // 获取矩阵每一列的最大/最小值，最大/最小值以数组 item_array 的形式存放在一个包含数组中，item_array 中第一个元素为 max，第二个元素为 min
+        // eg: [[0.4,0], [0.6,0], .....]
+        $max_and_min = $this -> getMaximumAndMinimum($prepared_input_matrix);
+
+        // 计算各位同学的 Si
+        $si_array = array();
+
+        for ($row = 0; $row < count($prepared_input_matrix); $row++) {
+            $di_plus_sum = 0;
+            $di_minus_sum = 0;
+            for ($column = 0; $column < count($prepared_input_matrix[0]); $column++) {
+                $di_plus_sum += $weight_matrix[$column] * pow(($max_and_min[$column][0] - $prepared_input_matrix[$row][$column]), 2);
+                $di_minus_sum += $weight_matrix[$column] * pow(($max_and_min[$column][1] - $prepared_input_matrix[$row][$column]), 2);
+            }
+            // 计算一位同学的 Di+
+            $di_plus = sqrt($di_plus_sum);
+            // 计算一位同学的 Di-
+            $di_minus = sqrt($di_minus_sum);
+
+            $si_array[$row] = $di_minus / ($di_minus + $di_plus);
+        }
+
+        return $si_array;
+    }
+
+    // private function topsis($input_matrix, $weight_matrix) {
+    //     // 定义标准化矩阵为具有n行m列的2D阵列
+    //     $normalized_matrix = array();
+
+    //     // 每列的平方和
+    //     $sum_of_squares = array();
+
+    //     // 每列平方和的平方根
+    //     $sqrt_sum_of_squares = array();
+
+    //     for ($j = 0; $j < count($input_matrix[0]); $j++) {
+    //         $sum_of_squares[$j] = 0;
+    //     }
+
+    //     // 构建标准化矩阵
+    //     for ($i = 0; $i < count($input_matrix); $i++) {
+    //         $row = array();
+    //         for ($j = 0; $j < count($input_matrix[$i]); $j++) {
+    //             $row[] = $input_matrix[$i][$j];
+    //             $sum_of_squares[$j] += pow($input_matrix[$i][$j], 2);
+    //         }
+    //         $normalized_matrix[] = $row;
+    //     }
+
+    //     for ($i = 0; $i < count($sum_of_squares); $i++) {
+    //         $sqrt_sum_of_squares[$i] = sqrt($sum_of_squares[$i]);
+    //     }
+
+    //     $weighted_normalized_matrix = array();
+    //     for ($i = 0; $i < count($normalized_matrix); $i++) {
+    //         $row = array();
+    //         for ($j = 0; $j < count($normalized_matrix[$i]); $j++) {
+    //             $row[] = $normalized_matrix[$i][$j] / $sqrt_sum_of_squares[$j];
+    //         }
+    //         $weighted_normalized_matrix[] = $row;
+    //     }
+
+    //     // 计算最优解和最劣解
+    //     $ideal_solution = array();
+    //     $negative_ideal_solution = array();
+    //     for ($i = 0; $i < count($weighted_normalized_matrix[0]); $i++) {
+    //         $column = array_column($weighted_normalized_matrix, $i);
+
+    //         $ideal_solution[] = max($column);
+    //         $negative_ideal_solution[] = min($column);
+    //         // if ($impact_matrix[$i] == 1) {
+    //         //     $ideal_solution[] = max($column);
+    //         //     $negative_ideal_solution[] = min($column);
+    //         // } else {
+    //         //     $ideal_solution[] = min($column);
+    //         //     $negative_ideal_solution[] = max($column);
+    //         // }
+    //     }
+
+    //     // 计算每个备选方案到最优解和最劣解的距离
+    //     $distance_to_ideal = array();
+    //     $distance_to_negative_ideal = array();
+    //     for ($i = 0; $i < count($weighted_normalized_matrix); $i++) {
+    //         $row = $weighted_normalized_matrix[$i];
+    //         $d_plus = 0;
+    //         $d_minus = 0;
+    //         for ($j = 0; $j < count($row); $j++) {
+    //             $d_plus += $weight_matrix[$j] * pow($row[$j] - $ideal_solution[$j], 2);
+    //             $d_minus += $weight_matrix[$j] * pow($row[$j] - $negative_ideal_solution[$j], 2);
+    //         }
+    //         $distance_to_ideal[] = sqrt($d_plus);
+    //         $distance_to_negative_ideal[] = sqrt($d_minus);
+    //     }
+
+    //     // 计算每个备选方案的得分
+    //     $performance_score = array();
+    //     for ($i = 0; $i < count($distance_to_negative_ideal); $i++) {
+    //         // echo 'userid'.$userid.' si is :'.$distance_to_negative_ideal[$i];
+    //         $performance_score[] = $distance_to_negative_ideal[$i] / ($distance_to_ideal[$i] + $distance_to_negative_ideal[$i]);
+    //     }
+
+    //     return $performance_score;
+
+    //     // Rank the alternatives based on their performance score
+    //     //        arsort($performance_score);
+    //     //        $ranked_alternatives = array_keys($performance_score);
+    //     //
+    //     //
+    //     //        return array($ranked_alternatives, $performance_score);
+    // }
 }

@@ -25,7 +25,7 @@ $wweight_matrix = array(0.2, 0.3, 0.4, 0.1);
 $iimpact_matrix = array(1, 1, 1, 1);
 
 
-echo var_dump(topsis($input_matrix, $wweight_matrix, $iimpact_matrix));
+// echo var_dump(topsis($input_matrix, $wweight_matrix, $iimpact_matrix));
 
 
 function topsis($input_matrix, $weight_matrix, $impact_matrix) {

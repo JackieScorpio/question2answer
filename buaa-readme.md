@@ -8,14 +8,15 @@
     - qa_posts 根据parentid判断回答的所属问题，根据created来判断哪个时间最早，就是首次回答
 2. Sa：回答被采纳次数。 
     - qa_userpoints aselecteds 字段
-3. Va：回答的平均得票数，即：总票数/回答次数。  
-    - qa_posts qa_userpoints 字段
+3. Va：回答的平均得票数。 
+    - qa_userpoints avoteds => 回答被投票对应的分数，upvote加2分，downvote减2分
+    - 用avoteds除以2就可以得到 回答的平均得票数
 4. Pa：回答的次数。 
     - qa_userpoints aposts 字段
 5. Pq：提问的次数。 
     - qa_userpoints qposts 字段
 6. Vq：问题平均得票数。
-    - qa_posts qa_userpoints 字段
+    - qa_userpoints qvoteds字段(和回答的平均得票数不同，upvote加1分，downvote减1分，所以不需要除以2就可以得到 问题平均得票数)
 7. Cq：问题在列表中被点击进入的次数。 
     - qa_posts clicktimes 字段
 8. Vp：投票的次数  *votes 字段
