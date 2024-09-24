@@ -76,6 +76,7 @@ $routing = array(
 	'click_question_times' => 'click-question-times.php',
     'badge_change' => 'badge-change.php',
     'user-stat' => 'user-stat.php',
+	'get_current_username' => 'get-current-username.php'
 );
 
 $operation = qa_post_text('qa_operation');

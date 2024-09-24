@@ -44,7 +44,7 @@ else {
 	// Otherwise, load the Q2A base file which sets up a bunch of crucial stuff
 	$qa_autoconnect = false;
 	require 'qa-base.php';
-
+	
 	/**
 	 * Determine the request and root of the installation, and the requested start position used by many pages.
 	 *
@@ -187,6 +187,9 @@ else {
 		} else {
 			require QA_INCLUDE_DIR . 'qa-page.php';
 		}
+		
+		// 进入每一页的时候，都需要判断是否已经登录
+		echo '<script src="qa-content/qa-utils.js"></script>';
 	}
 }
 
